@@ -1,93 +1,162 @@
-import { clamp } from "./utils";
+import GameObject from "./gameObject";
+import { clamp, addVectors, getDistance } from "./utils";
 
-export default class PlayerC implements Player {
-  x = 0;
-  y = 0;
-  w = 32;
-  h = 48;
-  dx = 0;
-  dy = 0;
-  speed = 10;
-  scale = 2;
-  direction = 1;
-  animations?: ImageBitmap[][] = [];
-  animationState = 0;
-  activeFrame = 0;
-  acumulatedFrames = 0;
+export default class PlayerC extends GameObject implements Player {
+  type = "player";
+  score = 0;
+
+  items: GameObject[] = [];
+  coolDown = false;
+
+  vel: Vector = [0, 0];
+  w: number;
+  h: number;
+  scale = 1.5;
+  images = {
+    body: null,
+    arms: null,
+  };
 
   constructor(
-    readonly name: string,
-    private color: string,
-    private controller: Controller,
-    spriteSheet: HTMLImageElement
+    name: string,
+    color: string,
+    body: HTMLImageElement,
+    arms: HTMLImageElement,
+    public controller: Controller
   ) {
-    this.setAnimations(spriteSheet);
+    super(name, color);
+
+    this.images = { body, arms };
+    this.w = arms.width * this.scale;
+    this.h = arms.height * this.scale;
   }
 
-  setAnimations(spriteSheet: HTMLImageElement) {
-    const frameH = spriteSheet.height / 2,
-      frameW = spriteSheet.width / 2;
+  get maxSpeed() {
+    return this.items.length ? 2 : 3;
+  }
 
-    Promise.all([
-      // idle frames
-      createImageBitmap(spriteSheet, 0, 0, frameW, frameH),
-      createImageBitmap(spriteSheet, frameW, 0, frameW, frameH),
-      // walk frames
-      createImageBitmap(spriteSheet, 0, frameH, frameW, frameH),
-      createImageBitmap(spriteSheet, frameW, frameH, frameW, frameH),
-    ]).then((images) => {
-      this.animations = [[images[2], images[2]], images.slice(2, 4)];
+  get hasPlayer() {
+    return this.items[0]?.type === "player";
+  }
+
+  get hasItems() {
+    return !!this.items.length;
+  }
+
+  accelerate() {
+    if (this.controller.left) this.vel[0] -= 0.2;
+    else if (this.controller.right) this.vel[0] += 0.2;
+    else this.vel[0] = 0;
+
+    if (this.controller.up) this.vel[1] -= 0.2;
+    else if (this.controller.down) this.vel[1] += 0.2;
+    else this.vel[1] = 0;
+
+    const s = this.maxSpeed;
+    this.vel[0] = clamp(-s, s, this.vel[0] * 1);
+    this.vel[1] = clamp(-s, s, this.vel[1] * 1);
+  }
+
+  commitAction(objects: GameObject[]) {
+    let closestTatget: { obj?: GameObject; dist: number } = {
+      obj: null,
+      dist: 500,
+    };
+
+    objects.forEach((obj) => {
+      let dist = getDistance(this.pos, obj.pos);
+      if (dist < closestTatget.dist) {
+        closestTatget = {
+          dist,
+          obj,
+        };
+      }
     });
+
+    if (closestTatget.dist <= this.w) {
+      closestTatget.obj.onAction(this);
+    }
   }
 
-  get currentFrame(): ImageBitmap | undefined {
-    if (this.animations[this.animationState])
-      return this.animations[this.animationState][this.activeFrame];
+  onAction(p: Player) {
+    const canPickMeUp =
+      p.items.length == 0 || p.items.every((item) => item.type === this.type);
+
+    const isMyChild = this.items.find((item) => item.id === p.id);
+    if (!canPickMeUp || isMyChild) return;
+
+    this.isPicked = true;
+    p.items.push(this);
   }
 
-  move() {
-    if (this.controller.up) this.dy -= 0.5;
-    else if (this.controller.down) this.dy += 0.5;
-    else this.dy = 0;
+  releaseItem() {
+    const player = this.items[0] as Player;
 
-    if (this.controller.left) {
-      this.direction = -1;
-      this.dx -= 0.5;
-    } else if (this.controller.right) {
-      this.direction = 1;
-      this.dx += 0.5;
-    } else this.dx = 0;
+    player.pos[1] += this.h * 1.4;
+    player.pos[0] += this.w;
+    player.isPicked = false;
 
-    this.dx = clamp(-this.speed, this.speed, this.dx * 0.75);
-    this.dy = clamp(-this.speed, this.speed, this.dy * 0.75);
-
-    this.x = clamp(0, 512, this.x + this.dx);
-    this.y = clamp(0, 512, this.y + this.dy);
+    this.items = [];
+    this.coolDown = true;
+    setTimeout(() => (this.coolDown = false), 1000);
   }
 
-  update() {
-    this.move();
+  update(level: GameObject[]) {
+    this.accelerate();
+    !this.isPicked && (this.pos = addVectors(this.pos, this.vel));
 
-    this.animationState = +!(this.dx === 0 && this.dy === 0);
-    if (++this.acumulatedFrames === 10) {
-      this.activeFrame = (this.activeFrame + 1) % 2;
-      this.acumulatedFrames = 0;
+    this.hasItems && this.updateItems();
+
+    if (!this.coolDown && this.controller.action) {
+      this.controller.action = false;
+
+      if (this.hasPlayer) {
+        this.releaseItem();
+      } else {
+        if (this.isPicked) level = level.filter((obj) => obj.id !== "player");
+        level = level.filter((obj) => obj.id !== this.id && !obj.isPicked);
+        this.commitAction(level);
+      }
     }
 
     return this;
   }
 
-  render(ctx: CanvasRenderingContext2D) {
+  updateItems() {
+    this.items.forEach((item) => {
+      item.pos[0] = this.pos[0];
+      item.pos[1] = this.pos[1] - this.h;
+    });
+  }
+
+  render(ctx: Ctx) {
     ctx.save();
+    ctx.translate(this.pos[0], this.pos[1]);
 
-    ctx.translate(this.x, this.y);
-    this.direction === -1 && ctx.translate(this.w * this.scale, 0);
+    if (!this.isPicked) {
+      ctx.fillStyle = this.color;
+      ctx.textAlign = "center";
+      ctx.font = "bold 12px monospace";
+      ctx.fillText(this.id, this.w * 0.5, this.h + 14);
+    }
 
-    ctx.scale(this.direction * this.scale, this.scale);
+    const [dx] = this.vel;
+    if (dx > 0) {
+      ctx.rotate(0.1);
+      ctx.translate(0, -3);
+    } else if (dx < 0) {
+      ctx.rotate(-0.1);
+      ctx.translate(0, 3);
+    }
 
-    this.currentFrame
-      ? ctx.drawImage(this.currentFrame, 0, 0)
-      : ctx.fillRect(0, 0, this.w, this.h);
+    ctx.scale(this.scale, this.scale);
+    ctx.drawImage(this.images.body, 11, 0);
+
+    if (this.items.length) {
+      ctx.scale(1, -this.scale);
+      ctx.translate(0, -this.h / 2);
+    }
+    ctx.drawImage(this.images.arms, 0, 0);
 
     ctx.restore();
   }

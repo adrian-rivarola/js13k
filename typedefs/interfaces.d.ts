@@ -1,3 +1,7 @@
+type Vector = [number, number];
+
+type Ctx = CanvasRenderingContext2D;
+
 interface Controller {
   up: boolean;
   down: boolean;
@@ -6,31 +10,40 @@ interface Controller {
   action: boolean;
 }
 
-declare enum AnimationState {
-  IDLE = 0,
-  WALK = 1,
-}
-
-interface Player {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  dx: number;
-  dy: number;
-  speed: number;
-  direction: number;
-  animations?: ImageBitmap[][];
-  update(): Player;
-  render(ctx: CanvasRenderingContext2D): void;
-}
-
-interface Position {
-  x: number;
-  y: number;
-}
-
-interface GameComponent {
+interface GameObject {
+  id: string;
+  pos: Vector;
   type: string;
+  color: string;
+  isPicked: boolean;
+  onAction(p: Player): void;
+  render(ctx: Ctx): void;
+}
+
+interface Player extends GameObject {
+  controller: Controller;
+  vel: Vector;
+  maxSpeed: number;
+  score: number;
+  items: GameObject[];
+  update(level: GameObject[]): Player;
+}
+
+interface Level {
+  playersPosition: Vector[];
+  itemsPosition: Record<string, Vector>;
+}
+
+interface Modifier {
+  type: string;
+  pos: Vector;
+  color?: string;
+  name?: string;
+  goal?: Item[];
   onAction(player: Player): void;
+}
+
+interface Item {
+  name: string;
+  color: string;
 }

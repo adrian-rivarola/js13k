@@ -12,8 +12,10 @@
         padding: 0;
       }
       body {
-        display: grid;
-        place-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         background-color: #333;
       }
       .vc {
@@ -21,8 +23,16 @@
         height: 32px;
         margin: 1em;
         border: none;
+        user-select: none;
         background-color: white;
         opacity: 0.7;
+      }
+      #game {
+        opacity: 0;
+        transition: 2s;
+      }
+      #game.loaded {
+        opacity: 1;
       }
     </style>
   </head>
