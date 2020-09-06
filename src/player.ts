@@ -1,10 +1,11 @@
 import GameObject from "./gameObject";
-import { clamp, addVectors, getDistance } from "./utils";
+import { clamp, addVectors, getDistance, getHueRotation } from "./utils";
 
 export default class Player extends GameObject {
   vel: Vector = [0, 0];
   item?: GameObject;
   maxSpeed = 3;
+
   scale = 1.5;
   scope = 72;
 
@@ -17,6 +18,7 @@ export default class Player extends GameObject {
     super(id, "player", color, assets.body);
     this.w = assets.arms.width * this.scale;
     this.h = assets.arms.height * this.scale;
+    this.hue = getHueRotation(color);
   }
 
   get rotation() {
@@ -24,6 +26,15 @@ export default class Player extends GameObject {
     if (dx > 0) return 0.1;
     if (dx < 0) return -0.1;
     return 0;
+  }
+
+  setColor(newColor: Color) {
+    let newHue = getHueRotation(newColor);
+
+    if (newHue !== -1) {
+      this.hue = newHue;
+      super.setColor(newColor);
+    } else console.log(`${this.id} cannot be painted in ${newColor}`);
   }
 
   accelerate() {
@@ -90,10 +101,11 @@ export default class Player extends GameObject {
 
     if (this.controller.action) {
       this.controller.action = false;
-
+      // alert(this.hue % 360);
       const [target, dist] = this.getClosestObject(level);
       if (dist < this.scope) target.onAction(this);
     }
+    // if (this.controller.release) ++this.hue;
     if (this.item && this.controller.release) this.releaseItem();
 
     return this;

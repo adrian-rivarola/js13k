@@ -30,7 +30,7 @@ interface GameObject {
   color: Color;
   asset?: HTMLImageElement;
   owner?: GameObject;
-
+  setColor(newColor: Color): void;
   onAction(actor: GameObject): void;
   update(level?: GameObject[]): GameObject;
   render(ctx: Ctx): void;

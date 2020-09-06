@@ -5,6 +5,8 @@ export default class GameObj implements GameObject {
   w = 32;
   h = 16;
 
+  hue = 0;
+
   offset = 0;
   offsetDirection = 1;
 
@@ -20,13 +22,18 @@ export default class GameObj implements GameObject {
     return [x + this.w / 2, y + this.h / 2];
   }
 
-  get rotation(): number {
+  get rotation() {
     return 0;
   }
 
   onAction(player: Player) {
     if (player.item) return;
     player.pickItem(this);
+  }
+
+  setColor(newColor: Color) {
+    this.color = newColor;
+    console.log(`${this.owner?.id} painted ${this.id} in ${newColor}`);
   }
 
   update(): GameObject {
@@ -61,6 +68,9 @@ export default class GameObj implements GameObject {
       ctx.rotate(this.rotation);
       ctx.translate(0, -20 * this.rotation);
     }
+
+    if (this.type === "player")
+      ctx.filter = `contrast(1.1) hue-rotate(${this.hue}deg)`;
 
     this.asset
       ? ctx.drawImage(this.asset, 11, 0)

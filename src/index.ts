@@ -17,12 +17,7 @@ const TILE_SIZE = canvas.width / 16;
 
 document.body.appendChild(canvas);
 
-const p1Controller =
-  window.orientation === undefined
-    ? new KeyboardController("wsadxc")
-    : new VirtualController();
-
-const players: Player[] = [];
+let players: Player[];
 const level: GameObject[] = [];
 
 export const assets: Record<string, HTMLImageElement> = {
@@ -49,15 +44,12 @@ function setup() {
     arms: assets.robotA,
   };
 
-  players.push(new Player("Player1", "pink", playerAsset, p1Controller));
-  players.push(
-    new Player(
-      "Player2",
-      "orange",
-      playerAsset,
-      new KeyboardController("824650")
-    )
-  );
+  players = [
+    new Player("P1", "red", playerAsset, new KeyboardController("wsadxc")),
+    new Player("P2", "green", playerAsset, new KeyboardController("824650")),
+    new Player("P3", "blue", playerAsset, new KeyboardController("ikjlnm")),
+    new Player("P4", "orange", playerAsset, new VirtualController()),
+  ];
 
   players.forEach((player, idx) => {
     player.pos[0] = (2 + idx) * 2.5 * TILE_SIZE;
@@ -65,13 +57,14 @@ function setup() {
     level.push(player);
   });
 
-  level.push(createItemProvider("<Header />", level));
-  level.push(createItemProvider("<Article />", level));
-  level.push(createItemProvider("<Footer />", level));
+  level.push(createItemProvider("<Header/>", level));
+  level.push(createItemProvider("<Article/>", level));
+  level.push(createItemProvider("<Footer/>", level));
 
-  level.push(createPainter("crimson"));
-  level.push(createPainter("lightgreen"));
-  level.push(createPainter("teal"));
+  level.push(createPainter("red"));
+  level.push(createPainter("blue"));
+  level.push(createPainter("orange"));
+  level.push(createPainter("green"));
 
   level
     .filter((item) => item.type !== "player")
