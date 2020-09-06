@@ -1,11 +1,73 @@
-export default abstract class GameObj implements GameObject {
+export default class GameObj implements GameObject {
   pos: Vector = [0, 0];
-  type = "";
-  isPicked = false;
+  owner?: Player;
+  scale = 1;
+  w = 32;
+  h = 16;
 
-  constructor(public id: string, public color: string) {}
+  offset = 0;
+  offsetDirection = 1;
 
-  abstract onAction(p: Player): void;
+  constructor(
+    public id: string,
+    public type: string,
+    public color: Color,
+    public asset?: HTMLImageElement
+  ) {}
 
-  abstract render(ctx: Ctx): void;
+  get center(): Vector {
+    let [x, y] = this.pos;
+    return [x + this.w / 2, y + this.h / 2];
+  }
+
+  get rotation(): number {
+    return 0;
+  }
+
+  onAction(player: Player) {
+    if (player.item) return;
+    player.pickItem(this);
+  }
+
+  update(): GameObject {
+    if (this.type === "item" && !this.owner) {
+      if (this.offset > 3) this.offsetDirection = -0.5;
+      else if (this.offset < -3) this.offsetDirection = 0.5;
+      this.offset += this.offsetDirection;
+    }
+
+    return this;
+  }
+
+  renderDetails(ctx: Ctx) {}
+
+  renderId(ctx: Ctx) {
+    ctx.textAlign = "center";
+    ctx.font = "bold 12px monospace";
+    ctx.fillText(this.id, this.w * 0.5, this.h + 14);
+  }
+
+  render(ctx: Ctx) {
+    let [x, y] = this.pos;
+    ctx.save();
+
+    ctx.translate(x, y + Math.floor(this.offset));
+    ctx.fillStyle = this.color;
+    !this.owner && this.renderId(ctx);
+
+    ctx.scale(this.scale, this.scale);
+    if (this.rotation) {
+      // rotate image and elevate shoulder
+      ctx.rotate(this.rotation);
+      ctx.translate(0, -20 * this.rotation);
+    }
+
+    this.asset
+      ? ctx.drawImage(this.asset, 11, 0)
+      : ctx.fillRect(0, 0, this.w, this.h);
+
+    this.renderDetails(ctx);
+
+    ctx.restore();
+  }
 }

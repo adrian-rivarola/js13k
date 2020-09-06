@@ -1,6 +1,12 @@
+type Color = string | CanvasGradient | CanvasPattern;
+type Command = (player: Player) => void;
+type Ctx = CanvasRenderingContext2D;
 type Vector = [number, number];
 
-type Ctx = CanvasRenderingContext2D;
+interface PlayerAssets {
+  body: HTMLImageElement;
+  arms: HTMLImageElement;
+}
 
 interface Controller {
   up: boolean;
@@ -8,42 +14,33 @@ interface Controller {
   left: boolean;
   right: boolean;
   action: boolean;
+  release: boolean;
 }
 
 interface GameObject {
   id: string;
   pos: Vector;
+  center: Vector;
+  w: number;
+  h: number;
+  item?: Item;
+  scale?: number;
+  rotation?: number;
   type: string;
-  color: string;
-  isPicked: boolean;
-  onAction(p: Player): void;
+  color: Color;
+  asset?: HTMLImageElement;
+  owner?: GameObject;
+
+  onAction(actor: GameObject): void;
+  update(level?: GameObject[]): GameObject;
   render(ctx: Ctx): void;
 }
+
+interface Item extends GameObject {}
 
 interface Player extends GameObject {
   controller: Controller;
   vel: Vector;
-  maxSpeed: number;
-  score: number;
-  items: GameObject[];
-  update(level: GameObject[]): Player;
-}
-
-interface Level {
-  playersPosition: Vector[];
-  itemsPosition: Record<string, Vector>;
-}
-
-interface Modifier {
-  type: string;
-  pos: Vector;
-  color?: string;
-  name?: string;
-  goal?: Item[];
-  onAction(player: Player): void;
-}
-
-interface Item {
-  name: string;
-  color: string;
+  pickItem(item: GameObject): void;
+  releaseItem(): void;
 }

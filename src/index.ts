@@ -3,6 +3,7 @@ import robotA from "../assets/hands.png";
 import floorImg from "../assets/floor.png";
 
 import Player from "./player";
+import { createItemProvider, createPainter } from "./modifiers";
 import { KeyboardController, VirtualController } from "./controller";
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
@@ -12,18 +13,19 @@ canvas.id = "game";
 canvas.width = 512;
 canvas.height = 512;
 
-const TILE_SIZE = canvas.width / 8;
+const TILE_SIZE = canvas.width / 16;
 
 document.body.appendChild(canvas);
 
 const p1Controller =
   window.orientation === undefined
-    ? new KeyboardController("wsadx")
+    ? new KeyboardController("wsadxc")
     : new VirtualController();
 
 const players: Player[] = [];
+const level: GameObject[] = [];
 
-const assets: Record<string, HTMLImageElement> = {
+export const assets: Record<string, HTMLImageElement> = {
   floor: new Image(),
   robotB: new Image(),
   robotA: new Image(),
@@ -39,66 +41,65 @@ for (let key in assets) {
     ++assetsLoaded === Object.keys(assets).length && setup();
 }
 
+let floorPattern: CanvasPattern;
+
 function setup() {
-  players.push(
-    new Player("Player1", "pink", assets.robotB, assets.robotA, p1Controller)
-  );
+  const playerAsset: PlayerAssets = {
+    body: assets.robotB,
+    arms: assets.robotA,
+  };
+
+  players.push(new Player("Player1", "pink", playerAsset, p1Controller));
   players.push(
     new Player(
       "Player2",
       "orange",
-      assets.robotB,
-      assets.robotA,
-      new KeyboardController("ikjlh")
-    )
-  );
-  players.push(
-    new Player(
-      "Player3",
-      "lightblue",
-      assets.robotB,
-      assets.robotA,
-      new KeyboardController([
-        "ArrowUp",
-        "ArrowDown",
-        "ArrowLeft",
-        "ArrowRight",
-        "Enter",
-      ])
-    )
-  );
-  players.push(
-    new Player(
-      "Player4",
-      "lightgreen",
-      assets.robotB,
-      assets.robotA,
-      new KeyboardController("82465")
+      playerAsset,
+      new KeyboardController("824650")
     )
   );
 
   players.forEach((player, idx) => {
-    player.pos[0] = (2 + idx) * TILE_SIZE;
-    player.pos[1] = 3.5 * TILE_SIZE;
+    player.pos[0] = (2 + idx) * 2.5 * TILE_SIZE;
+    player.pos[1] = 7 * TILE_SIZE;
+    level.push(player);
   });
+
+  level.push(createItemProvider("<Header />", level));
+  level.push(createItemProvider("<Article />", level));
+  level.push(createItemProvider("<Footer />", level));
+
+  level.push(createPainter("crimson"));
+  level.push(createPainter("lightgreen"));
+  level.push(createPainter("teal"));
+
+  level
+    .filter((item) => item.type !== "player")
+    .forEach((item, idx) => {
+      item.pos = [TILE_SIZE, (idx + 1) * 2 * TILE_SIZE];
+    });
+
+  floorPattern = ctx.createPattern(assets.floor, "repeat");
 
   canvas.classList.add("loaded");
   start();
 }
 
-const level: GameObject[] = players;
-
 function start() {
   requestAnimationFrame(start);
 
+  drawFloor(ctx);
+  level.forEach((item) => item.update(level).render(ctx));
+}
+
+function drawFloor(ctx: Ctx) {
   ctx.save();
-  ctx.fillStyle = ctx.createPattern(assets.floor, "repeat");
+  ctx.fillStyle = floorPattern;
+  ctx.scale(2, 2);
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.restore();
-
-  players.forEach((player) => player.update(level).render(ctx));
 }

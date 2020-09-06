@@ -28,6 +28,9 @@ export class KeyboardController implements Controller {
   get action() {
     return KEYBOARD[this.keys[4]]?.active;
   }
+  get release() {
+    return KEYBOARD[this.keys[5]]?.active;
+  }
   set action(active: boolean) {
     KEYBOARD[this.keys[4]].active = active;
   }
@@ -35,19 +38,15 @@ export class KeyboardController implements Controller {
 
 export class VirtualController extends KeyboardController {
   constructor() {
-    super(["VU", "VD", "VL", "VR", "VA"]);
+    super(["VU", "VD", "VL", "VR", "VA", "VX"]);
     this.init();
   }
 
   init() {
     const div = document.createElement("div");
-    const buttons = [
-      document.createElement("button"),
-      document.createElement("button"),
-      document.createElement("button"),
-      document.createElement("button"),
-      document.createElement("button"),
-    ];
+    const buttons = (this.keys as string[]).map(() =>
+      document.createElement("button")
+    );
 
     buttons.forEach((button, i) => {
       button.ontouchstart = button.onmousedown = () => {

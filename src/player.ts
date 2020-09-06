@@ -1,163 +1,110 @@
 import GameObject from "./gameObject";
 import { clamp, addVectors, getDistance } from "./utils";
 
-export default class PlayerC extends GameObject implements Player {
-  type = "player";
-  score = 0;
-
-  items: GameObject[] = [];
-  coolDown = false;
-
+export default class Player extends GameObject {
   vel: Vector = [0, 0];
-  w: number;
-  h: number;
+  item?: GameObject;
+  maxSpeed = 3;
   scale = 1.5;
-  images = {
-    body: null,
-    arms: null,
-  };
+  scope = 72;
 
   constructor(
-    name: string,
-    color: string,
-    body: HTMLImageElement,
-    arms: HTMLImageElement,
+    id: string,
+    color: Color,
+    private assets: PlayerAssets,
     public controller: Controller
   ) {
-    super(name, color);
-
-    this.images = { body, arms };
-    this.w = arms.width * this.scale;
-    this.h = arms.height * this.scale;
+    super(id, "player", color, assets.body);
+    this.w = assets.arms.width * this.scale;
+    this.h = assets.arms.height * this.scale;
   }
 
-  get maxSpeed() {
-    return this.items.length ? 2 : 3;
-  }
-
-  get hasPlayer() {
-    return this.items[0]?.type === "player";
-  }
-
-  get hasItems() {
-    return !!this.items.length;
+  get rotation() {
+    const [dx] = this.vel;
+    if (dx > 0) return 0.1;
+    if (dx < 0) return -0.1;
+    return 0;
   }
 
   accelerate() {
-    if (this.controller.left) this.vel[0] -= 0.2;
-    else if (this.controller.right) this.vel[0] += 0.2;
+    if (this.controller.left) this.vel[0] -= 0.15;
+    else if (this.controller.right) this.vel[0] += 0.15;
     else this.vel[0] = 0;
 
-    if (this.controller.up) this.vel[1] -= 0.2;
-    else if (this.controller.down) this.vel[1] += 0.2;
+    if (this.controller.up) this.vel[1] -= 0.15;
+    else if (this.controller.down) this.vel[1] += 0.15;
     else this.vel[1] = 0;
 
-    const s = this.maxSpeed;
-    this.vel[0] = clamp(-s, s, this.vel[0] * 1);
-    this.vel[1] = clamp(-s, s, this.vel[1] * 1);
+    let s = this.maxSpeed;
+    this.vel[0] = clamp(-s, s, this.vel[0]);
+    this.vel[1] = clamp(-s, s, this.vel[1]);
   }
 
-  commitAction(objects: GameObject[]) {
-    let closestTatget: { obj?: GameObject; dist: number } = {
-      obj: null,
-      dist: 500,
-    };
+  move() {
+    this.pos = addVectors(this.pos, this.vel);
 
-    objects.forEach((obj) => {
-      let dist = getDistance(this.pos, obj.pos);
-      if (dist < closestTatget.dist) {
-        closestTatget = {
-          dist,
-          obj,
-        };
-      }
-    });
-
-    if (closestTatget.dist <= this.w) {
-      closestTatget.obj.onAction(this);
+    if (this.item) {
+      this.item.pos = [...this.pos];
+      this.item.pos[1] -= this.h;
     }
   }
 
-  onAction(p: Player) {
-    const canPickMeUp =
-      p.items.length == 0 || p.items.every((item) => item.type === this.type);
+  pickItem(item: GameObject) {
+    console.log(`${this.id} picked ${item.id}`);
 
-    const isMyChild = this.items.find((item) => item.id === p.id);
-    if (!canPickMeUp || isMyChild) return;
-
-    this.isPicked = true;
-    p.items.push(this);
+    item.w = this.w;
+    item.owner = this;
+    this.item = item;
   }
 
   releaseItem() {
-    const player = this.items[0] as Player;
+    console.log(`${this.id} released ${this.item.id}`);
 
-    player.pos[1] += this.h * 1.4;
-    player.pos[0] += this.w;
-    player.isPicked = false;
-
-    this.items = [];
-    this.coolDown = true;
-    setTimeout(() => (this.coolDown = false), 1000);
+    this.item.owner = null;
+    this.item = null;
   }
 
-  update(level: GameObject[]) {
+  getClosestObject(level: GameObject[]): [GameObject, number] {
+    let result: [GameObject, number] = [null, 1000];
+
+    // filter valid targets
+    level = level.filter(
+      (obj) =>
+        this.id !== obj.id &&
+        this.item?.id !== obj.id &&
+        this.owner?.id !== obj.id
+    );
+
+    level.forEach((object) => {
+      let distance = getDistance(this.center, object.center);
+      if (distance < result[1]) result = [object, distance];
+    });
+
+    return result;
+  }
+
+  update(level?: GameObject[]) {
     this.accelerate();
-    !this.isPicked && (this.pos = addVectors(this.pos, this.vel));
 
-    this.hasItems && this.updateItems();
+    this.move();
 
-    if (!this.coolDown && this.controller.action) {
+    if (this.controller.action) {
       this.controller.action = false;
 
-      if (this.hasPlayer) {
-        this.releaseItem();
-      } else {
-        if (this.isPicked) level = level.filter((obj) => obj.id !== "player");
-        level = level.filter((obj) => obj.id !== this.id && !obj.isPicked);
-        this.commitAction(level);
-      }
+      const [target, dist] = this.getClosestObject(level);
+      if (dist < this.scope) target.onAction(this);
     }
+    if (this.item && this.controller.release) this.releaseItem();
 
     return this;
   }
 
-  updateItems() {
-    this.items.forEach((item) => {
-      item.pos[0] = this.pos[0];
-      item.pos[1] = this.pos[1] - this.h;
-    });
-  }
-
-  render(ctx: Ctx) {
-    ctx.save();
-    ctx.translate(this.pos[0], this.pos[1]);
-
-    if (!this.isPicked) {
-      ctx.fillStyle = this.color;
-      ctx.textAlign = "center";
-      ctx.font = "bold 12px monospace";
-      ctx.fillText(this.id, this.w * 0.5, this.h + 14);
-    }
-
-    const [dx] = this.vel;
-    if (dx > 0) {
-      ctx.rotate(0.1);
-      ctx.translate(0, -3);
-    } else if (dx < 0) {
-      ctx.rotate(-0.1);
-      ctx.translate(0, 3);
-    }
-
-    ctx.scale(this.scale, this.scale);
-    ctx.drawImage(this.images.body, 11, 0);
-
-    if (this.items.length) {
+  renderDetails(ctx: Ctx) {
+    if (this.item) {
+      // raise hands
       ctx.scale(1, -this.scale);
       ctx.translate(0, -this.h / 2);
     }
-    ctx.drawImage(this.images.arms, 0, 0);
-
-    ctx.restore();
+    ctx.drawImage(this.assets.arms, 0, 0);
   }
 }
