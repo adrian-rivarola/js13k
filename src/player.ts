@@ -1,7 +1,7 @@
 import GameObject from "./gameObject";
 import { clamp, addVectors, getDistance, getHueRotation } from "./utils";
 
-export default class Player extends GameObject {
+export default class extends GameObject {
   vel: Vector = [0, 0];
   item?: GameObject;
   maxSpeed = 3;
@@ -99,6 +99,8 @@ export default class Player extends GameObject {
 
     this.move();
 
+    this.updateOffset();
+
     if (this.controller.action) {
       this.controller.action = false;
       // alert(this.hue % 360);
@@ -112,6 +114,7 @@ export default class Player extends GameObject {
   }
 
   renderDetails(ctx: Ctx) {
+    // ctx.translate(0, -this.offset);
     if (this.item) {
       // raise hands
       ctx.scale(1, -this.scale);

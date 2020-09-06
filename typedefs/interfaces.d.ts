@@ -19,24 +19,26 @@ interface Controller {
 
 interface GameObject {
   id: string;
+  type: string;
+
   pos: Vector;
   center: Vector;
+
   w: number;
   h: number;
-  item?: Item;
-  scale?: number;
-  rotation?: number;
-  type: string;
+
   color: Color;
-  asset?: HTMLImageElement;
+  item?: GameObject;
   owner?: GameObject;
+  scale?: number;
+  asset?: HTMLImageElement;
+  rotation?: number;
+
   setColor(newColor: Color): void;
   onAction(actor: GameObject): void;
   update(level?: GameObject[]): GameObject;
   render(ctx: Ctx): void;
 }
-
-interface Item extends GameObject {}
 
 interface Player extends GameObject {
   controller: Controller;

@@ -1,4 +1,4 @@
-export default class GameObj implements GameObject {
+export default class implements GameObject {
   pos: Vector = [0, 0];
   owner?: Player;
   scale = 1;
@@ -37,16 +37,15 @@ export default class GameObj implements GameObject {
   }
 
   update(): GameObject {
-    if (this.type === "item" && !this.owner) {
-      if (this.offset > 3) this.offsetDirection = -0.5;
-      else if (this.offset < -3) this.offsetDirection = 0.5;
-      this.offset += this.offsetDirection;
-    }
-
+    this.type === "item" && this.updateOffset();
     return this;
   }
 
-  renderDetails(ctx: Ctx) {}
+  updateOffset() {
+    if (this.offset > 3) this.offsetDirection = -0.5;
+    else if (this.offset < -3) this.offsetDirection = 0.5;
+    this.offset += this.offsetDirection;
+  }
 
   renderId(ctx: Ctx) {
     ctx.textAlign = "center";
@@ -54,8 +53,15 @@ export default class GameObj implements GameObject {
     ctx.fillText(this.id, this.w * 0.5, this.h + 14);
   }
 
+  renderDetails(ctx: Ctx) {
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, this.w, this.h);
+  }
+
   render(ctx: Ctx) {
     let [x, y] = this.pos;
+
     ctx.save();
 
     ctx.translate(x, y + Math.floor(this.offset));

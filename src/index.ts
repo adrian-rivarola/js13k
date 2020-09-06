@@ -3,8 +3,12 @@ import robotA from "../assets/hands.png";
 import floorImg from "../assets/floor.png";
 
 import Player from "./player";
-import { createItemProvider, createPainter } from "./modifiers";
-import { KeyboardController, VirtualController } from "./controller";
+import {
+  createItemProvider,
+  createPainter,
+  createStorageServer,
+} from "./modifiers";
+import { KeyboardController } from "./controller";
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 const ctx: Ctx = canvas.getContext("2d");
@@ -47,8 +51,6 @@ function setup() {
   players = [
     new Player("P1", "red", playerAsset, new KeyboardController("wsadxc")),
     new Player("P2", "green", playerAsset, new KeyboardController("824650")),
-    new Player("P3", "blue", playerAsset, new KeyboardController("ikjlnm")),
-    new Player("P4", "orange", playerAsset, new VirtualController()),
   ];
 
   players.forEach((player, idx) => {
@@ -61,10 +63,12 @@ function setup() {
   level.push(createItemProvider("<Article/>", level));
   level.push(createItemProvider("<Footer/>", level));
 
-  level.push(createPainter("red"));
-  level.push(createPainter("blue"));
-  level.push(createPainter("orange"));
-  level.push(createPainter("green"));
+  // level.push(createPainter("red"));
+  level.push(createPainter("teal"));
+  level.push(createPainter("crimson"));
+  // level.push(createPainter("green"));
+
+  level.push(createStorageServer(level));
 
   level
     .filter((item) => item.type !== "player")
