@@ -1,81 +1,156 @@
 import GameObjectClass from "./gameObject";
+import { getDistance } from "./utils";
+import { ctx } from "./index";
 
 class Modifier extends GameObjectClass {
   w = 32;
   h = 32;
 
-  constructor(id: string, type: string, actionCommand: Command, color?: Color) {
-    super(id, type, color || "lightblue");
+  constructor(id: string, actionCommand: Command, color?: Color) {
+    super(id, "modifier", color || "lightblue");
     this.onAction = (player: Player) => actionCommand(player);
   }
 }
 
-export function createItemProvider(
-  itemId: string,
-  level: GameObject[]
-): Modifier {
+export function createItemProvider(itemId: string, level: GameObject[]) {
   const command = (player: Player) => {
-    if (player.item) {
-      console.log(`${player.id} already has an item!`);
-      return;
-    }
+    if (player.item) return;
+
     let newItem = new GameObjectClass(itemId, "item", "white");
     player.pickItem(newItem);
     level.unshift(newItem);
   };
 
-  return new Modifier(itemId, "modifier", command);
+  return new Modifier(itemId, command);
 }
 
-export function createPainter(color: Color): Modifier {
-  const command: Command = (player: Player) => {
-    player.item?.setColor(color);
-  };
+export function createPainter(color: Color) {
+  const command: Command = (player: Player) => player.item?.setColor(color);
 
   let id = typeof color === "string" ? color : "painter";
-  return new Modifier(id, "modifier", command, color);
+  return new Modifier(id, command, color);
 }
 
-export function createStorageServer(level: GameObject[]): Modifier {
+export function createTrahsCan(level: GameObject[]) {
+  function command(player: Player) {
+    if (!player.item || player.item.type === "player") return;
+
+    let idx = level.findIndex((object) => object.id === player.item.id);
+    if (idx !== -1) {
+      console.log(`${player.item.id} deleted`);
+
+      player.releaseItem();
+      level.splice(idx, 1);
+    }
+  }
+
+  return new Modifier("TrashCan", command, "purple");
+}
+
+export function createStorageServer() {
   const storage: GameObject[] = [];
-  let server: Modifier;
   let maxCapacity = 5;
+  let server: Modifier;
 
-  const command = (player: Player) => {
+  function command(player: Player) {
     if (player.item) {
-      if (player.item.item) {
-        console.log(
-          `cannot store ${player.id}, because it contains ${player.item.item.id}`
-        );
-      } else if (storage.length < maxCapacity) {
-        // stop rendering this item
-        let idx = level.findIndex((item) => item.id === player.item.id);
-        level.splice(idx, 1);
+      if (storage.length === maxCapacity || player.item.item)
+        return console.log(`cannot store ${player.item.id}`);
 
-        storage.push(player.item);
-        console.log(`${player.item.id} stored in server`);
-        player.releaseItem();
-      } else {
-        console.log("server is full");
-      }
+      storage.push(player.releaseItem(false));
     } else if (storage.length) {
-      let item = storage.pop();
-      console.log(`${item.id} retrieved from server`);
-
-      level.unshift(item);
-      player.pickItem(item);
+      player.pickItem(storage.pop());
     } else {
       console.log("server is empty");
     }
 
-    server.id = `Items: ${storage.length}/${maxCapacity}`;
-  };
+    server.id = `Capacity: ${storage.length}/${maxCapacity}`;
+  }
 
   server = new Modifier(
-    "Items: 0/" + maxCapacity,
-    "modifier",
+    "Capacity: 0/" + maxCapacity,
+
     command,
-    "yellow"
+    "grey"
   );
+
+  server.renderDetails = function (ctx: Ctx) {
+    ctx.translate(4, 4);
+    storage.forEach((object, idx) => {
+      ctx.fillStyle = object.color;
+      ctx.fillRect(0, idx * 5, server.w - 8, 4);
+    });
+  };
+
   return server;
+}
+
+export function createSpeedBooster() {
+  let booster: Modifier;
+  let enabled = true;
+
+  function command(player: Player) {
+    if (!enabled) return;
+
+    enabled = false;
+    booster.color = "rgba(255, 255, 255, 0.0)";
+
+    ++player.maxSpeed;
+    player.acc *= 2;
+
+    setTimeout(() => {
+      enabled = true;
+      booster.color = "rgba(255, 255, 255, 0.1)";
+      --player.maxSpeed;
+      player.acc /= 2;
+    }, Math.floor(2 + Math.random() * 3) * 1000);
+  }
+
+  booster = new Modifier("speedBost", () => {}, "rgba(255, 255, 255, 0.1)");
+
+  booster.update = (level: GameObject[]) => {
+    if (!enabled) return booster;
+
+    let players = level.filter((object) => object.type === "player");
+
+    players.forEach((player) => {
+      let dist = getDistance(player.pos, booster.pos);
+      dist < 30 && command(player as any);
+    });
+
+    return booster;
+  };
+
+  return booster;
+}
+
+export function creatBug() {
+  const command = (object: GameObject) => {
+    if (object.item?.type !== "item" || typeof object.item.color !== "string")
+      return;
+
+    const gradient = ctx.createLinearGradient(0, 0, 32, 32);
+    gradient.addColorStop(0.3, object.item.color);
+    gradient.addColorStop(0.3, "darkgreen");
+
+    object.item.color = gradient;
+  };
+
+  const bug = new Modifier("bug", command, "darkgreen");
+  bug.w = 32;
+  bug.h = 32;
+
+  bug.update = (level: GameObject[]) => {
+    const [target, dist] = bug.getClosestObject(
+      level.filter((object) => object.type === "player")
+    );
+    if (dist < 64) command(target);
+
+    bug.pos[0] = (bug.pos[0] + 3) % 512;
+    bug.pos[1] = (bug.pos[1] + 2) % 512;
+
+    return bug;
+  };
+
+  return bug;
 }

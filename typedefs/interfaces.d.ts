@@ -20,6 +20,7 @@ interface Controller {
 interface GameObject {
   id: string;
   type: string;
+  active: boolean;
 
   pos: Vector;
   center: Vector;
@@ -34,8 +35,9 @@ interface GameObject {
   asset?: HTMLImageElement;
   rotation?: number;
 
-  setColor(newColor: Color): void;
+  getClosestObject(level: GameObject[]): [GameObject, number];
   onAction(actor: GameObject): void;
+  setColor(newColor: Color): void;
   update(level?: GameObject[]): GameObject;
   render(ctx: Ctx): void;
 }
@@ -43,6 +45,12 @@ interface GameObject {
 interface Player extends GameObject {
   controller: Controller;
   vel: Vector;
+
+  maxSpeed: number;
+  acc: number;
+
+  accelerate(): void;
+  move(): void;
   pickItem(item: GameObject): void;
-  releaseItem(): void;
+  releaseItem(isActive?: boolean): GameObject;
 }

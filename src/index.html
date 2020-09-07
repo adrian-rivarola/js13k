@@ -10,6 +10,7 @@
         height: 100vh;
         margin: 0;
         padding: 0;
+        overflow: hidden;
       }
       body {
         display: flex;
@@ -29,7 +30,7 @@
       }
       #game {
         opacity: 0;
-        transition: 2s;
+        transition: 3s;
       }
       #game.loaded {
         opacity: 1;
@@ -38,18 +39,18 @@
   </head>
   <body></body>
   <script type="text/javascript">
-    (function () {
-      var script = document.createElement("script");
-      script.onload = function () {
-        var stats = new Stats();
-        document.body.appendChild(stats.dom);
-        requestAnimationFrame(function loop() {
-          stats.update();
-          requestAnimationFrame(loop);
-        });
-      };
-      script.src = "//mrdoob.github.io/stats.js/build/stats.min.js";
-      document.head.appendChild(script);
-    })();
+    // (function () {
+    //   var script = document.createElement("script");
+    //   script.onload = function () {
+    //     var stats = new Stats();
+    //     document.body.appendChild(stats.dom);
+    //     requestAnimationFrame(function loop() {
+    //       stats.update();
+    //       requestAnimationFrame(loop);
+    //     });
+    //   };
+    //   script.src = "//mrdoob.github.io/stats.js/build/stats.min.js";
+    //   document.head.appendChild(script);
+    // })();
   </script>
 </html>

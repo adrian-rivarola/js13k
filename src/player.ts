@@ -1,13 +1,15 @@
 import GameObject from "./gameObject";
 import { clamp, addVectors, getDistance, getHueRotation } from "./utils";
 
-export default class extends GameObject {
+export default class extends GameObject implements Player {
   vel: Vector = [0, 0];
   item?: GameObject;
+
   maxSpeed = 3;
+  acc = 0.3;
 
   scale = 1.5;
-  scope = 72;
+  scope = 64;
 
   constructor(
     id: string,
@@ -16,8 +18,10 @@ export default class extends GameObject {
     public controller: Controller
   ) {
     super(id, "player", color, assets.body);
+
     this.w = assets.arms.width * this.scale;
     this.h = assets.arms.height * this.scale;
+
     this.hue = getHueRotation(color);
   }
 
@@ -38,12 +42,12 @@ export default class extends GameObject {
   }
 
   accelerate() {
-    if (this.controller.left) this.vel[0] -= 0.15;
-    else if (this.controller.right) this.vel[0] += 0.15;
+    if (this.controller.left) this.vel[0] -= this.acc;
+    else if (this.controller.right) this.vel[0] += this.acc;
     else this.vel[0] = 0;
 
-    if (this.controller.up) this.vel[1] -= 0.15;
-    else if (this.controller.down) this.vel[1] += 0.15;
+    if (this.controller.up) this.vel[1] -= this.acc;
+    else if (this.controller.down) this.vel[1] += this.acc;
     else this.vel[1] = 0;
 
     let s = this.maxSpeed;
@@ -66,32 +70,18 @@ export default class extends GameObject {
     item.w = this.w;
     item.owner = this;
     this.item = item;
+    this.item.active = true;
   }
+  
+  releaseItem(isActive = true): GameObject {
+    const item = this.item;
 
-  releaseItem() {
-    console.log(`${this.id} released ${this.item.id}`);
-
-    this.item.owner = null;
     this.item = null;
-  }
+    item.active = isActive;
+    item.owner = null;
 
-  getClosestObject(level: GameObject[]): [GameObject, number] {
-    let result: [GameObject, number] = [null, 1000];
-
-    // filter valid targets
-    level = level.filter(
-      (obj) =>
-        this.id !== obj.id &&
-        this.item?.id !== obj.id &&
-        this.owner?.id !== obj.id
-    );
-
-    level.forEach((object) => {
-      let distance = getDistance(this.center, object.center);
-      if (distance < result[1]) result = [object, distance];
-    });
-
-    return result;
+    console.log(`${this.id} released ${item.id}`);
+    return item;
   }
 
   update(level?: GameObject[]) {

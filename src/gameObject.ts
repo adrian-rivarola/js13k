@@ -1,11 +1,16 @@
+import { getDistance } from "./utils";
+
 export default class implements GameObject {
   pos: Vector = [0, 0];
-  owner?: Player;
-  scale = 1;
+  active = true;
+
   w = 32;
   h = 16;
-
   hue = 0;
+  scale = 1;
+
+  item?: GameObject;
+  owner?: Player;
 
   offset = 0;
   offsetDirection = 1;
@@ -28,6 +33,7 @@ export default class implements GameObject {
 
   onAction(player: Player) {
     if (player.item) return;
+
     player.pickItem(this);
   }
 
@@ -36,14 +42,34 @@ export default class implements GameObject {
     console.log(`${this.owner?.id} painted ${this.id} in ${newColor}`);
   }
 
-  update(): GameObject {
+  getClosestObject(level: GameObject[]): [GameObject, number] {
+    let result: [GameObject, number] = [null, 1000];
+
+    // filter valid targets
+    level = level.filter(
+      (obj) =>
+        obj.active &&
+        this.id !== obj.id &&
+        this.item?.id !== obj.id &&
+        this.owner?.id !== obj.id
+    );
+
+    level.forEach((object) => {
+      let distance = getDistance(this.center, object.center);
+      if (distance < result[1]) result = [object, distance];
+    });
+
+    return result;
+  }
+
+  update(level?: GameObject[]): GameObject {
     this.type === "item" && this.updateOffset();
     return this;
   }
 
   updateOffset() {
-    if (this.offset > 3) this.offsetDirection = -0.5;
-    else if (this.offset < -3) this.offsetDirection = 0.5;
+    if (this.offset > 2) this.offsetDirection = -0.25;
+    else if (this.offset < -2) this.offsetDirection = 0.25;
     this.offset += this.offsetDirection;
   }
 
@@ -64,7 +90,7 @@ export default class implements GameObject {
 
     ctx.save();
 
-    ctx.translate(x, y + Math.floor(this.offset));
+    ctx.translate(x, y + this.offset);
     ctx.fillStyle = this.color;
     !this.owner && this.renderId(ctx);
 
