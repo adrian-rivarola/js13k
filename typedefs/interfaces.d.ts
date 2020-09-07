@@ -22,6 +22,9 @@ interface GameObject {
   type: string;
   active: boolean;
 
+  scale: number;
+  rotation?: number;
+
   pos: Vector;
   center: Vector;
 
@@ -31,25 +34,22 @@ interface GameObject {
   color: Color;
   item?: GameObject;
   owner?: GameObject;
-  scale?: number;
   asset?: HTMLImageElement;
-  rotation?: number;
 
   getClosestObject(level: GameObject[]): [GameObject, number];
   onAction(actor: GameObject): void;
+
+  onResize(tileSize: number, scale: number): void;
   setColor(newColor: Color): void;
+
   update(level?: GameObject[]): GameObject;
   render(ctx: Ctx): void;
 }
 
 interface Player extends GameObject {
-  controller: Controller;
   vel: Vector;
-
   maxSpeed: number;
-  acc: number;
 
-  accelerate(): void;
   move(): void;
   pickItem(item: GameObject): void;
   releaseItem(isActive?: boolean): GameObject;

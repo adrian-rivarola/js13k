@@ -1,14 +1,14 @@
 import GameObject from "./gameObject";
-import { clamp, addVectors, getDistance, getHueRotation } from "./utils";
+import { clamp, addVectors, getHueRotation } from "./utils";
 
 export default class extends GameObject implements Player {
   vel: Vector = [0, 0];
   item?: GameObject;
 
-  maxSpeed = 3;
-  acc = 0.3;
+  maxSpeed = 2;
+  acc = 0.2;
 
-  scale = 1.5;
+  scale = 1;
   scope = 64;
 
   constructor(
@@ -19,8 +19,8 @@ export default class extends GameObject implements Player {
   ) {
     super(id, "player", color, assets.body);
 
-    this.w = assets.arms.width * this.scale;
-    this.h = assets.arms.height * this.scale;
+    this.w = assets.arms.width;
+    this.h = assets.body.height;
 
     this.hue = getHueRotation(color);
   }
@@ -39,6 +39,14 @@ export default class extends GameObject implements Player {
       this.hue = newHue;
       super.setColor(newColor);
     } else console.log(`${this.id} cannot be painted in ${newColor}`);
+  }
+
+  onResize(tileSize: number, scale: number) {
+    this.scale = scale;
+    this.w *= scale;
+    this.h *= scale;
+
+    this.maxSpeed = tileSize / 14;
   }
 
   accelerate() {
@@ -67,12 +75,11 @@ export default class extends GameObject implements Player {
   pickItem(item: GameObject) {
     console.log(`${this.id} picked ${item.id}`);
 
-    item.w = this.w;
     item.owner = this;
     this.item = item;
     this.item.active = true;
   }
-  
+
   releaseItem(isActive = true): GameObject {
     const item = this.item;
 
@@ -86,9 +93,7 @@ export default class extends GameObject implements Player {
 
   update(level?: GameObject[]) {
     this.accelerate();
-
     this.move();
-
     this.updateOffset();
 
     if (this.controller.action) {
@@ -107,8 +112,10 @@ export default class extends GameObject implements Player {
     // ctx.translate(0, -this.offset);
     if (this.item) {
       // raise hands
-      ctx.scale(1, -this.scale);
-      ctx.translate(0, -this.h / 2);
+      ctx.translate(0, this.h * 0.75);
+      ctx.scale(1, -1);
+    } else {
+      ctx.translate(0, this.h * 0.25);
     }
     ctx.drawImage(this.assets.arms, 0, 0);
   }

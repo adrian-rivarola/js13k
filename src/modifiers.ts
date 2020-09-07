@@ -3,12 +3,13 @@ import { getDistance } from "./utils";
 import { ctx } from "./index";
 
 class Modifier extends GameObjectClass {
-  w = 32;
-  h = 32;
-
   constructor(id: string, actionCommand: Command, color?: Color) {
-    super(id, "modifier", color || "lightblue");
+    super(id, "modifier", color);
     this.onAction = (player: Player) => actionCommand(player);
+  }
+
+  onResize(tileSize: number) {
+    this.w = this.h = tileSize;
   }
 }
 
@@ -96,13 +97,11 @@ export function createSpeedBooster() {
     booster.color = "rgba(255, 255, 255, 0.0)";
 
     ++player.maxSpeed;
-    player.acc *= 2;
 
     setTimeout(() => {
       enabled = true;
       booster.color = "rgba(255, 255, 255, 0.1)";
       --player.maxSpeed;
-      player.acc /= 2;
     }, Math.floor(2 + Math.random() * 3) * 1000);
   }
 
@@ -137,8 +136,6 @@ export function creatBug() {
   };
 
   const bug = new Modifier("bug", command, "darkgreen");
-  bug.w = 32;
-  bug.h = 32;
 
   bug.update = (level: GameObject[]) => {
     const [target, dist] = bug.getClosestObject(

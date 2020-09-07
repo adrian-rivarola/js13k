@@ -1,11 +1,14 @@
-import { getDistance } from "./utils";
+import { getDistance, addVectors } from "./utils";
+import { TILE_SIZE } from "./index";
 
 export default class implements GameObject {
   pos: Vector = [0, 0];
+  vel: Vector = [0, 0];
   active = true;
 
-  w = 32;
-  h = 16;
+  w: number;
+  h: number;
+
   hue = 0;
   scale = 1;
 
@@ -18,9 +21,11 @@ export default class implements GameObject {
   constructor(
     public id: string,
     public type: string,
-    public color: Color,
+    public color: Color = "white",
     public asset?: HTMLImageElement
-  ) {}
+  ) {
+    this.onResize(TILE_SIZE, 1);
+  }
 
   get center(): Vector {
     let [x, y] = this.pos;
@@ -37,21 +42,22 @@ export default class implements GameObject {
     player.pickItem(this);
   }
 
+  onResize(tileSize: number, scale: number) {
+    this.w = tileSize * 1.5;
+    this.h = tileSize * 0.5;
+  }
+
   setColor(newColor: Color) {
     this.color = newColor;
-    console.log(`${this.owner?.id} painted ${this.id} in ${newColor}`);
   }
 
   getClosestObject(level: GameObject[]): [GameObject, number] {
     let result: [GameObject, number] = [null, 1000];
 
     // filter valid targets
+    const invalidIds = [this.id, this.item?.id, this.owner?.id];
     level = level.filter(
-      (obj) =>
-        obj.active &&
-        this.id !== obj.id &&
-        this.item?.id !== obj.id &&
-        this.owner?.id !== obj.id
+      (obj) => obj.active && !obj.owner && !invalidIds.includes(obj.id)
     );
 
     level.forEach((object) => {

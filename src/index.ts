@@ -5,10 +5,8 @@ import floorImg from "../assets/floor.png";
 import Player from "./player";
 import {
   createStorageServer,
-  createSpeedBooster,
   createItemProvider,
   createPainter,
-  creatBug,
   createTrahsCan,
 } from "./modifiers";
 import { KeyboardController } from "./controller";
@@ -17,14 +15,36 @@ const canvas: HTMLCanvasElement = document.createElement("canvas");
 export const ctx: Ctx = canvas.getContext("2d");
 
 canvas.id = "game";
-canvas.width = 512;
-canvas.height = 512;
+canvas.width = canvas.height = 640;
 
-export const TILE_SIZE = canvas.width / 16;
+// canvas.onclick = () => document.documentElement.requestFullscreen();
+
+export let TILE_SIZE = 32;
+
+function resize() {
+  let s = Math.min(innerWidth, innerHeight);
+  s = s - (s % 32);
+
+  canvas.width = s;
+  canvas.height = s;
+
+  let oldSize = TILE_SIZE;
+  TILE_SIZE = Math.floor(s / 16);
+
+  let scaleTo = TILE_SIZE / oldSize;
+
+  level.forEach((object) => {
+    object.pos[0] *= scaleTo;
+    object.pos[1] *= scaleTo;
+
+    object.onResize(TILE_SIZE, s / 640);
+  });
+}
+
+onresize = resize;
 
 document.body.appendChild(canvas);
 
-let levelNum = 1;
 const level: GameObject[] = [];
 
 export const assets: Record<string, HTMLImageElement> = {
@@ -43,7 +63,7 @@ for (let key in assets) {
     ++assetsLoaded === Object.keys(assets).length && setup();
 }
 
-let floorPattern: CanvasPattern;
+// let floorPattern: CanvasPattern;
 
 function createPlayers() {
   const playerAsset: PlayerAssets = {
@@ -55,20 +75,19 @@ function createPlayers() {
     new Player("Player1", "red", playerAsset, new KeyboardController("wsadxc")),
     new Player(
       "Player2",
-      "green",
+      "blue",
       playerAsset,
       new KeyboardController("824650")
     ),
   ];
 
-  players.forEach((player, idx) => {
-    player.pos[1] = TILE_SIZE * 6;
-    player.pos[0] = (idx + 2) * TILE_SIZE * 2.5;
+  players.forEach((player) => {
+    player.pos[0] = TILE_SIZE * 7.5;
+    player.pos[1] = TILE_SIZE * 7.5;
 
     level.push(player);
   });
 }
-
 function createProviders() {
   const provs = [
     createItemProvider("<Header/>", level),
@@ -81,7 +100,6 @@ function createProviders() {
     level.push(prov);
   });
 }
-
 function createPainters() {
   const painters = [
     createPainter("red"),
@@ -94,7 +112,6 @@ function createPainters() {
     level.push(painter);
   });
 }
-
 function createOthers() {
   const server = createStorageServer();
   server.pos = [TILE_SIZE, TILE_SIZE * 14];
@@ -103,14 +120,6 @@ function createOthers() {
   const trashCan = createTrahsCan(level);
   trashCan.pos = [TILE_SIZE * 14, TILE_SIZE * 14];
   level.push(trashCan);
-
-  const speedBooster = createSpeedBooster();
-  speedBooster.pos = [TILE_SIZE * 8, TILE_SIZE * 12];
-  level.push(speedBooster);
-
-  const bug1 = creatBug();
-  bug1.pos = [TILE_SIZE * 3, TILE_SIZE * 7];
-  level.push(bug1);
 }
 
 function setup() {
@@ -119,9 +128,10 @@ function setup() {
   createProviders();
   createOthers();
 
-  floorPattern = ctx.createPattern(assets.floor, "repeat");
+  // floorPattern = ctx.createPattern(assets.floor, "repeat");
   canvas.classList.add("loaded");
 
+  resize();
   start();
 }
 
@@ -131,20 +141,23 @@ function start() {
   drawFloor(ctx);
   level.forEach((object) => object.active && object.update(level).render(ctx));
 
-  ctx.textAlign = "center";
   ctx.fillStyle = "white";
-  ctx.font = "16px monospace";
+  ctx.textAlign = "center";
+  ctx.font = `14px monospace`;
+
   ctx.fillText(`Items: ${level.length}`, canvas.width / 2, canvas.height - 20);
-  ctx.fillText(`Level: ${levelNum}`, canvas.width / 2, 20);
+  ctx.fillText(`Size: ${canvas.width}`, canvas.width / 2, 20);
 }
 
 function drawFloor(ctx: Ctx) {
   ctx.save();
-  ctx.fillStyle = floorPattern;
-  ctx.scale(2, 2);
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // ctx.fillStyle = floorPattern;
+  // ctx.scale(TILE_SIZE / 16, TILE_SIZE / 16);
+  // ctx.scale(2, 2);
+  // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.fillStyle = "black";
+  // ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.restore();
