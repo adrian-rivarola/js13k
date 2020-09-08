@@ -1,12 +1,14 @@
-import robotB from "../assets/robot.png";
-import robotA from "../assets/hands.png";
-import floorImg from "../assets/floor.png";
-
 import Player from "./player";
 import { KeyboardController, VirtualController } from "./controller";
 
 import { createLevel } from "./levels/setup";
 import LEVELS from "./levels/";
+
+import ASSETS, { loadAssets } from "./assets";
+
+window.onload = function () {
+  loadAssets().then(setup).catch(console.error);
+};
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 export const ctx: Ctx = canvas.getContext("2d");
@@ -55,22 +57,6 @@ onresize = resize;
 
 document.body.appendChild(canvas);
 
-export const assets: Record<string, HTMLImageElement> = {
-  floor: new Image(),
-  robotB: new Image(),
-  robotA: new Image(),
-};
-
-assets.floor.src = floorImg;
-assets.robotB.src = robotB;
-assets.robotA.src = robotA;
-
-let assetsLoaded = 0;
-for (let key in assets) {
-  assets[key].onload = () =>
-    ++assetsLoaded === Object.keys(assets).length && setup();
-}
-
 let floorPattern: CanvasPattern;
 
 const game = {
@@ -92,28 +78,13 @@ function setLevel(num: number) {
 }
 
 function createPlayers() {
-  const playerAsset: PlayerAssets = {
-    body: assets.robotB,
-    arms: assets.robotA,
-  };
-
   let players =
     window.orientation === undefined
       ? [
-          new Player(
-            "Player1",
-            "red",
-            playerAsset,
-            new KeyboardController("wsadxc")
-          ),
-          new Player(
-            "Player2",
-            "blue",
-            playerAsset,
-            new KeyboardController("824650")
-          ),
+          new Player("Player1", "red", new KeyboardController("wsadxc")),
+          new Player("Player2", "blue", new KeyboardController("824650")),
         ]
-      : [new Player("Player1", "red", playerAsset, new VirtualController())];
+      : [new Player("Player1", "red", new VirtualController())];
 
   players.forEach((player, idx) => {
     player.pos[0] = TILE_SIZE * 5 * (idx + 1);
@@ -127,7 +98,7 @@ function setup() {
   setLevel(0);
   createPlayers();
 
-  floorPattern = ctx.createPattern(assets.floor, "repeat");
+  floorPattern = ctx.createPattern(ASSETS.floor, "repeat");
   canvas.classList.add("loaded");
 
   resize();

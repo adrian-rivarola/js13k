@@ -10,17 +10,21 @@ class Modifier extends GameObjectClass {
     actionCommand: Command,
     color?: Color
   ) {
-    super(id, "modifier", color);
+    super(id, "floor", color);
 
     this.pos[0] = position[0] * TILE_SIZE;
     this.pos[1] = position[1] * TILE_SIZE;
+    // this.scale = 2;
 
     this.onAction = (player: Player) => actionCommand(player);
   }
 
-  onResize(tileSize: number) {
+  onResize(tileSize: number, scale: number) {
+    this.scale *= scale;
     this.w = this.h = tileSize;
   }
+
+  renderDetails(ctx: Ctx) {}
 }
 
 export function createItemProvider(

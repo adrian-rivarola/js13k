@@ -3,11 +3,6 @@ type Command = (player: Player) => void;
 type Ctx = CanvasRenderingContext2D;
 type Vector = [number, number];
 
-interface PlayerAssets {
-  body: HTMLImageElement;
-  arms: HTMLImageElement;
-}
-
 interface GameState {
   modifiers: GameObject[];
   players: Player[];

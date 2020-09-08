@@ -1,9 +1,12 @@
 import GameObject from "./gameObject";
+import ASSETS from "./assets";
+
 import { clamp, addVectors, getHueRotation } from "./utils";
 
 export default class extends GameObject implements Player {
   vel: Vector = [0, 0];
   item?: GameObject;
+  arms: HTMLImageElement;
 
   maxSpeed = 2;
   acc = 0.2;
@@ -11,16 +14,13 @@ export default class extends GameObject implements Player {
   scale = 1;
   scope = 40;
 
-  constructor(
-    id: string,
-    color: Color,
-    private assets: PlayerAssets,
-    public controller: Controller
-  ) {
-    super(id, "player", color, assets.body);
+  constructor(id: string, color: Color, public controller: Controller) {
+    super(id, "player", color);
 
-    this.w = assets.arms.width;
-    this.h = assets.body.height;
+    this.arms = ASSETS.playerArms;
+
+    this.w = ASSETS.playerArms.width;
+    this.h = ASSETS.player.height;
 
     this.hue = getHueRotation(color);
   }
@@ -87,12 +87,12 @@ export default class extends GameObject implements Player {
 
   releaseItem(isActive = true): GameObject {
     const item = this.item;
-
-    this.item = null;
     item.active = isActive;
     item.owner = null;
 
+    this.item = null;
     console.log(`${this.id} released ${item.id}`);
+
     return item;
   }
 
@@ -121,6 +121,6 @@ export default class extends GameObject implements Player {
     } else {
       ctx.translate(0, this.h * 0.25);
     }
-    ctx.drawImage(this.assets.arms, 0, 0);
+    ctx.drawImage(this.arms, 0, 0);
   }
 }

@@ -1,10 +1,13 @@
-import { getDistance, addVectors } from "./utils";
+import { getDistance } from "./utils";
 import { TILE_SIZE } from "./index";
+
+import ASSETS from "./assets";
 
 export default class implements GameObject {
   pos: Vector = [0, 0];
   active = true;
 
+  asset?: HTMLImageElement;
   w: number;
   h: number;
 
@@ -20,9 +23,9 @@ export default class implements GameObject {
   constructor(
     public id: string,
     public type: string,
-    public color: Color = "white",
-    public asset?: HTMLImageElement
+    public color: Color = "white"
   ) {
+    this.asset = ASSETS[type];
     this.onResize(TILE_SIZE, 1);
   }
 
@@ -42,6 +45,7 @@ export default class implements GameObject {
   }
 
   onResize(tileSize: number, scale: number) {
+    this.scale = scale;
     this.w = tileSize * 1.5;
     this.h = tileSize * 0.5;
   }
