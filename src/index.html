@@ -35,9 +35,15 @@
       #game.loaded {
         opacity: 1;
       }
+      #levelDiv {
+        background: white;
+        padding: 2px 20px 2px;
+      }
     </style>
   </head>
-  <body></body>
+  <body>
+    <div id="levelDiv"></div>
+  </body>
   <script type="text/javascript">
     (function () {
       var script = document.createElement("script");
@@ -49,7 +55,7 @@
           requestAnimationFrame(loop);
         });
       };
-      script.src = "//mrdoob.github.io/stats.js/build/stats.min.js";
+      script.src = "https://mrdoob.github.io/stats.js/build/stats.min.js";
       document.head.appendChild(script);
     })();
   </script>

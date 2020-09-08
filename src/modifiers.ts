@@ -32,7 +32,7 @@ export function createItemProvider(
 
     let newItem = new GameObjectClass(itemId, "item", "white");
     player.pickItem(newItem);
-    level.unshift(newItem);
+    level.push(newItem);
   };
 
   return new Modifier(itemId, pos, command);

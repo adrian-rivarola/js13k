@@ -110,7 +110,7 @@ export default class implements GameObject {
       ctx.filter = `contrast(1.1) hue-rotate(${this.hue}deg)`;
 
     this.asset
-      ? ctx.drawImage(this.asset, 11, 0)
+      ? ctx.drawImage(this.asset, 0, 0)
       : ctx.fillRect(0, 0, this.w, this.h);
 
     this.renderDetails(ctx);

@@ -5,15 +5,15 @@ import {
 } from "../modifiers";
 
 export function createLevel(config: LevelConfig, gameObjects: GameObject[]) {
-  const providers = config.providers.map((config) =>
-    gameObjects.push(createItemProvider(config, gameObjects))
-  );
-  const painters = config.painters.map((config) =>
-    gameObjects.push(createPainter(config))
-  );
-  const servers = config.servers.map((config) =>
-    gameObjects.push(createStorageServer(config))
+  config.providers.forEach((config) =>
+    gameObjects.unshift(createItemProvider(config, gameObjects))
   );
 
-  return [...providers, ...painters, ...servers];
+  config.painters.forEach((config) =>
+    gameObjects.unshift(createPainter(config))
+  );
+
+  config.servers.forEach((config) =>
+    gameObjects.unshift(createStorageServer(config))
+  );
 }

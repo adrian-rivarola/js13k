@@ -9,7 +9,7 @@ export default class extends GameObject implements Player {
   acc = 0.2;
 
   scale = 1;
-  scope = 64;
+  scope = 40;
 
   constructor(
     id: string,
@@ -42,11 +42,12 @@ export default class extends GameObject implements Player {
   }
 
   onResize(tileSize: number, scale: number) {
-    this.scale = scale;
+    this.scale *= scale;
     this.w *= scale;
     this.h *= scale;
 
-    this.maxSpeed = tileSize / 14;
+    this.maxSpeed = tileSize / 16;
+    this.scope = tileSize * 1.5;
   }
 
   accelerate() {
@@ -102,21 +103,20 @@ export default class extends GameObject implements Player {
 
     if (this.controller.action) {
       this.controller.action = false;
-      // alert(this.hue % 360);
+
       const [target, dist] = this.getClosestObject(level);
       if (dist < this.scope) target.onAction(this);
     }
-    // if (this.controller.release) ++this.hue;
+
     if (this.item && this.controller.release) this.releaseItem();
 
     return this;
   }
 
   renderDetails(ctx: Ctx) {
-    // ctx.translate(0, -this.offset);
     if (this.item) {
       // raise hands
-      ctx.translate(0, this.h * 0.75);
+      ctx.translate(0, this.h * 0.5);
       ctx.scale(1, -1);
     } else {
       ctx.translate(0, this.h * 0.25);

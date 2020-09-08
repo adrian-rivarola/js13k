@@ -1,8 +1,8 @@
 let capacity = 4;
 
 const level0: LevelConfig = {
-  providers: [{ itemId: "<HelloWorld />", pos: [3, 7.5] }],
-  painters: [{ color: "teal", pos: [12, 7.5] }],
+  providers: [{ itemId: "<HelloWorld />", pos: [3, 7] }],
+  painters: [{ color: "teal", pos: [12, 7] }],
   // servers: [{ pos: [7.5, 12], capacity: 1 }],
   servers: [],
 };

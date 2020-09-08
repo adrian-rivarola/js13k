@@ -22,8 +22,10 @@ const prevLevel = document.createElement("button");
 prevLevel.innerText = "<";
 prevLevel.onclick = () => setLevel(game.levelId - 1);
 
-document.body.appendChild(prevLevel);
-document.body.appendChild(nextLevel);
+const levelDiv = document.getElementById("levelDiv");
+
+levelDiv.appendChild(prevLevel);
+levelDiv.appendChild(nextLevel);
 
 // canvas.onclick = () => document.documentElement.requestFullscreen();
 
@@ -31,7 +33,7 @@ export let TILE_SIZE = 32;
 
 function resize() {
   let s = Math.min(innerWidth, innerHeight);
-  s = s - (s % 32);
+  s -= s % 32;
 
   canvas.width = s;
   canvas.height = s;
@@ -39,13 +41,13 @@ function resize() {
   let oldSize = TILE_SIZE;
   TILE_SIZE = Math.floor(s / 16);
 
-  let scaleTo = TILE_SIZE / oldSize;
+  let scale = TILE_SIZE / oldSize;
 
   game.level.forEach((object) => {
-    object.pos[0] *= scaleTo;
-    object.pos[1] *= scaleTo;
+    object.pos[0] *= scale;
+    object.pos[1] *= scale;
 
-    object.onResize(TILE_SIZE, s / 640);
+    object.onResize(TILE_SIZE, scale);
   });
 }
 
@@ -77,7 +79,9 @@ const game = {
 };
 
 function setLevel(num: number) {
-  if (num === game.levelId || num < 0 || num >= LEVELS.length) return;
+  if (num === game.levelId) return;
+
+  num %= LEVELS.length;
 
   game.level = game.level.filter(
     (object) => object.type === "player" || object.owner
@@ -93,19 +97,27 @@ function createPlayers() {
     arms: assets.robotA,
   };
 
-  let players = [
-    new Player("Player1", "red", playerAsset, new KeyboardController("wsadxc")),
-    new Player(
-      "Player2",
-      "blue",
-      playerAsset,
-      new KeyboardController("824650")
-    ),
-  ];
+  let players =
+    window.orientation === undefined
+      ? [
+          new Player(
+            "Player1",
+            "red",
+            playerAsset,
+            new KeyboardController("wsadxc")
+          ),
+          new Player(
+            "Player2",
+            "blue",
+            playerAsset,
+            new KeyboardController("824650")
+          ),
+        ]
+      : [new Player("Player1", "red", playerAsset, new VirtualController())];
 
   players.forEach((player, idx) => {
-    player.pos[0] = TILE_SIZE * (8 - players.length) * idx;
-    player.pos[1] = TILE_SIZE * 7.5;
+    player.pos[0] = TILE_SIZE * 5 * (idx + 1);
+    player.pos[1] = TILE_SIZE * 7;
 
     game.level.push(player);
   });
@@ -129,17 +141,17 @@ function start() {
   game.level.forEach(
     (object) => object.active && object.update(game.level).render(ctx)
   );
-
-  ctx.fillStyle = "white";
-  ctx.textAlign = "center";
-  ctx.font = `14px monospace`;
-
-  ctx.fillText(
-    `Items: ${game.level.length}`,
-    canvas.width / 2,
-    canvas.height - 20
-  );
-  ctx.fillText(`Level: ${game.levelId}`, canvas.width / 2, 20);
+  //
+  // ctx.fillStyle = "white";
+  // ctx.textAlign = "center";
+  // ctx.font = `14px monospace`;
+  //
+  // ctx.fillText(
+  //   `Items: ${game.level.length}`,
+  //   canvas.width / 2,
+  //   canvas.height - 20
+  // );
+  // ctx.fillText(`Level: ${game.levelId}`, canvas.width / 2, 20);
 }
 
 function drawFloor(ctx: Ctx) {
@@ -152,6 +164,15 @@ function drawFloor(ctx: Ctx) {
   // ctx.fillStyle = "black";
   ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // ctx.fillStyle = "white";
+  // for (let i = 0; i < 16; i++) {
+  //   for (let j = 0; j < 16; j++) {
+  //     ctx.beginPath();
+  //     ctx.arc(i * TILE_SIZE, j * TILE_SIZE, 3, 0, Math.PI * 2);
+  //     ctx.fill();
+  //   }
+  // }
 
   ctx.restore();
 }
