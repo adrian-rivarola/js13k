@@ -8,13 +8,10 @@ interface PlayerAssets {
   arms: HTMLImageElement;
 }
 
-interface Controller {
-  up: boolean;
-  down: boolean;
-  left: boolean;
-  right: boolean;
-  action: boolean;
-  release: boolean;
+interface GameState {
+  modifiers: GameObject[];
+  players: Player[];
+  items: GameObject[];
 }
 
 interface GameObject {
@@ -53,4 +50,13 @@ interface Player extends GameObject {
   move(): void;
   pickItem(item: GameObject): void;
   releaseItem(isActive?: boolean): GameObject;
+}
+
+interface Controller {
+  up: boolean;
+  down: boolean;
+  left: boolean;
+  right: boolean;
+  action: boolean;
+  release: boolean;
 }

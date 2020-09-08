@@ -17,7 +17,7 @@ export function getHueRotation(color: Color): number {
     case "green":
       return 150;
     case "orange":
-      return 40;
+      return 55;
     case "purple":
       return 284;
     case "red":

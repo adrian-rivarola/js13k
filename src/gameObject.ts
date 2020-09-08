@@ -3,7 +3,6 @@ import { TILE_SIZE } from "./index";
 
 export default class implements GameObject {
   pos: Vector = [0, 0];
-  vel: Vector = [0, 0];
   active = true;
 
   w: number;

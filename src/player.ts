@@ -68,6 +68,7 @@ export default class extends GameObject implements Player {
 
     if (this.item) {
       this.item.pos = [...this.pos];
+      this.item.pos[0] += (this.w - this.item.w) / 2;
       this.item.pos[1] -= this.h;
     }
   }
@@ -76,8 +77,11 @@ export default class extends GameObject implements Player {
     console.log(`${this.id} picked ${item.id}`);
 
     item.owner = this;
+    item.active = true;
+    item.offset = this.offset;
+    item.offsetDirection = this.offsetDirection;
+
     this.item = item;
-    this.item.active = true;
   }
 
   releaseItem(isActive = true): GameObject {
