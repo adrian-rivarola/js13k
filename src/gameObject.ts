@@ -45,7 +45,7 @@ export default class implements GameObject {
   }
 
   onResize(tileSize: number, scale: number) {
-    this.scale = scale;
+    // this.scale = scale;
     this.w = tileSize * 1.5;
     this.h = tileSize * 0.5;
   }

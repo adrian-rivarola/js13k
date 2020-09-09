@@ -10,7 +10,7 @@ class Modifier extends GameObjectClass {
     actionCommand: Command,
     color?: Color
   ) {
-    super(id, "floor", color);
+    super(id, "modifier", color);
 
     this.pos[0] = position[0] * TILE_SIZE;
     this.pos[1] = position[1] * TILE_SIZE;
@@ -20,7 +20,7 @@ class Modifier extends GameObjectClass {
   }
 
   onResize(tileSize: number, scale: number) {
-    this.scale *= scale;
+    // this.scale *= scale;
     this.w = this.h = tileSize;
   }
 
