@@ -1,6 +1,5 @@
 import { getDistance } from "./utils";
-import { TILE_SIZE } from "./index";
-
+import { SCALE, TILE_SIZE } from "./setup";
 import ASSETS from "./assets";
 
 export default class implements GameObject {
@@ -8,11 +7,11 @@ export default class implements GameObject {
   active = true;
 
   asset?: HTMLImageElement;
-  w: number;
-  h: number;
+  w = TILE_SIZE * 1.5;
+  h = TILE_SIZE * 0.5;
 
   hue = 0;
-  scale = 1;
+  scale = SCALE;
 
   item?: GameObject;
   owner?: Player;
@@ -26,7 +25,6 @@ export default class implements GameObject {
     public color: Color = "white"
   ) {
     this.asset = ASSETS[type];
-    this.onResize(TILE_SIZE, 1);
   }
 
   get center(): Vector {
@@ -44,10 +42,10 @@ export default class implements GameObject {
     player.pickItem(this);
   }
 
-  onResize(tileSize: number, scale: number) {
-    // this.scale = scale;
-    this.w = tileSize * 1.5;
-    this.h = tileSize * 0.5;
+  onResize(scaleTo: number) {
+    this.scale *= scaleTo;
+    this.w *= scaleTo;
+    this.h *= scaleTo;
   }
 
   setColor(newColor: Color) {

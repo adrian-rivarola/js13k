@@ -11,7 +11,6 @@ export default class extends GameObject implements Player {
   maxSpeed = 2;
   acc = 0.2;
 
-  scale = 1;
   scope = 40;
 
   constructor(id: string, color: Color, public controller: Controller) {
@@ -41,13 +40,14 @@ export default class extends GameObject implements Player {
     } else console.log(`${this.id} cannot be painted in ${newColor}`);
   }
 
-  onResize(tileSize: number, scale: number) {
-    this.scale *= scale;
-    this.w *= scale;
-    this.h *= scale;
+  onResize(scaleTo: number) {
+    // this.scale *= scale;
+    // this.w *= scale;
+    // this.h *= scale;
+    super.onResize(scaleTo);
 
-    this.maxSpeed = tileSize / 16;
-    this.scope = tileSize * 1.5;
+    this.maxSpeed *= scaleTo;
+    this.scope *= scaleTo;
   }
 
   accelerate() {

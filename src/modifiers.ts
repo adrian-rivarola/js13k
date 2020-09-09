@@ -1,5 +1,5 @@
 import GameObjectClass from "./gameObject";
-import { TILE_SIZE } from "./index";
+import { SCALE, TILE_SIZE } from "./setup";
 // import { getDistance } from "./utils";
 // import { ctx } from "./index";
 
@@ -11,17 +11,13 @@ class Modifier extends GameObjectClass {
     color?: Color
   ) {
     super(id, "modifier", color);
+    this.w = this.h = TILE_SIZE;
 
     this.pos[0] = position[0] * TILE_SIZE;
     this.pos[1] = position[1] * TILE_SIZE;
-    // this.scale = 2;
+    this.scale = SCALE;
 
     this.onAction = (player: Player) => actionCommand(player);
-  }
-
-  onResize(tileSize: number, scale: number) {
-    // this.scale *= scale;
-    this.w = this.h = tileSize;
   }
 
   renderDetails(ctx: Ctx) {}

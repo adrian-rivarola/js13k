@@ -4,9 +4,14 @@ type Ctx = CanvasRenderingContext2D;
 type Vector = [number, number];
 
 interface GameState {
-  modifiers: GameObject[];
+  isPaused: boolean;
+  levelId: number;
+  objects: GameObject[];
   players: Player[];
-  items: GameObject[];
+
+  init(level?: number): void;
+  onResize(scaleTo: number): void;
+  render(ctx: Ctx): void;
 }
 
 interface GameObject {
@@ -31,7 +36,7 @@ interface GameObject {
   getClosestObject(level: GameObject[]): [GameObject, number];
   onAction(actor: GameObject): void;
 
-  onResize(tileSize: number, scale: number): void;
+  onResize(scaleTo: number): void;
   setColor(newColor: Color): void;
 
   update(level?: GameObject[]): GameObject;
