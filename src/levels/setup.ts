@@ -1,19 +1,31 @@
+import LEVELS from "./index";
 import {
   createPainter,
   createItemProvider,
   createStorageServer,
 } from "../modifiers";
 
-export function createLevel(config: LevelConfig, gameObjects: GameObject[]) {
-  config.providers.forEach((config) =>
-    gameObjects.unshift(createItemProvider(config, gameObjects))
-  );
+export const COLORS = ["#80ffdb", "#e63946", "#fca311", "#f4a261", "#e76f51"];
 
-  config.painters.forEach((config) =>
-    gameObjects.unshift(createPainter(config))
-  );
+export const ITEMS = [
+  "HelloWorld />",
+  "<Header />",
+  "<Article />",
+  "<Div />",
+  "<Image />",
+  "<Footer />",
+];
 
-  config.servers.forEach((config) =>
-    gameObjects.unshift(createStorageServer(config))
+export function createLevel(levelIdx: number, gameObjects: GameObject[]) {
+  levelIdx %= LEVELS.length;
+
+  const config = LEVELS[levelIdx];
+
+  gameObjects.unshift(
+    ...config.providers.map((pos, idx) =>
+      createItemProvider(pos, ITEMS[idx], gameObjects)
+    ),
+    ...config.painters.map((pos, idx) => createPainter(pos, COLORS[idx])),
+    ...config.servers.map(createStorageServer)
   );
 }

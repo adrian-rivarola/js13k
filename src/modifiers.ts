@@ -4,19 +4,16 @@ import { TILE_SIZE } from "./setup";
 // import { ctx } from "./index";
 
 class Modifier extends GameObjectClass {
+  preventCollision = true;
+
   constructor(
     id: string,
     position: Vector,
     actionCommand: Command,
     color?: Color
   ) {
-    super(id, "modifier", color);
+    super(id, "modifier", position, color);
     this.w = this.h = TILE_SIZE;
-
-    this.pos[0] = position[0] * TILE_SIZE;
-    this.pos[1] = position[1] * TILE_SIZE;
-
-    console.log({ id, position });
 
     this.onAction = (player: Player) => actionCommand(player);
   }
@@ -25,13 +22,14 @@ class Modifier extends GameObjectClass {
 }
 
 export function createItemProvider(
-  { itemId, pos }: ProviderConfig,
+  pos: Vector,
+  itemId: string,
   level: GameObject[]
 ) {
   const command = (player: Player) => {
     if (player.item) return;
 
-    let newItem = new GameObjectClass(itemId, "item", "white");
+    let newItem = new GameObjectClass(itemId, "item", pos, "white");
     player.pickItem(newItem);
     level.push(newItem);
   };
@@ -39,18 +37,15 @@ export function createItemProvider(
   return new Modifier(itemId, pos, command);
 }
 
-export function createPainter({ color, pos }: PainterConfig) {
+export function createPainter(pos: Vector, color: string) {
   const command: Command = (player: Player) => player.item?.setColor(color);
 
-  let id =
-    typeof color === "string"
-      ? color[0].toUpperCase() + color.substring(1)
-      : "";
-  return new Modifier(id + " Painter", pos, command, color);
+  return new Modifier("Painter", pos, command, color);
 }
 
-export function createStorageServer({ pos, capacity = 3 }: ServerConfig) {
+export function createStorageServer(pos: Vector) {
   const storage: GameObject[] = [];
+  let capacity = 3;
   let server: Modifier;
 
   function command(player: Player) {
@@ -75,14 +70,14 @@ export function createStorageServer({ pos, capacity = 3 }: ServerConfig) {
 
     storage.forEach((object, idx) => {
       ctx.fillStyle = object.color;
-      ctx.fillRect(0, idx * 6, server.w * 0.4, 4);
+      ctx.fillRect(0, idx * 6, server.w * 0.25, 4);
     });
   };
 
   return server;
 }
 
-export function createTrahsCan(position: Vector, level: GameObject[]) {
+export function createTrahsCan(pos: Vector, level: GameObject[]) {
   function command(player: Player) {
     if (!player.item || player.item.type === "player") return;
 
@@ -95,7 +90,7 @@ export function createTrahsCan(position: Vector, level: GameObject[]) {
     }
   }
 
-  return new Modifier("TrashCan", position, command, "purple");
+  return new Modifier("TrashCan", pos, command, "purple");
 }
 
 // export function createSpeedBooster() {

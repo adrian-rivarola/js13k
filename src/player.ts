@@ -3,19 +3,23 @@ import ASSETS from "./assets";
 
 import { TILE_SIZE } from "./setup";
 
-import { clamp, addVectors, getHueRotation } from "./utils";
+import { clamp, addVectors, getDistance, getHueRotation } from "./utils";
 
 export default class extends GameObject implements Player {
   vel: Vector = [0, 0];
   item?: GameObject;
-
   maxSpeed = TILE_SIZE / 16;
   acc = 0.2;
 
   scope = TILE_SIZE * 1.5;
 
-  constructor(id: string, color: Color, public controller: Controller) {
-    super(id, "player", color);
+  constructor(
+    id: string,
+    gridPos: Vector,
+    color: Color,
+    public controller: Controller
+  ) {
+    super(id, "player", gridPos, color);
 
     this.scale *= 0.8;
     this.w = ASSETS.playerArms.width * this.scale;
@@ -63,9 +67,17 @@ export default class extends GameObject implements Player {
     this.vel[1] = clamp(-s, s, this.vel[1]);
   }
 
-  move() {
-    this.pos = addVectors(this.pos, this.vel);
+  move(level: GameObject[]) {
+    const nextPos = addVectors(this.pos, this.vel);
 
+    let collision = level.some(
+      (object) =>
+        object.preventCollision &&
+        getDistance(object.pos, nextPos) < TILE_SIZE * 0.9
+    );
+    if (collision) return;
+
+    this.pos = nextPos;
     if (this.item) {
       this.item.pos = [...this.pos];
       this.item.pos[0] += (this.w - this.item.w) / 2;
@@ -94,10 +106,15 @@ export default class extends GameObject implements Player {
 
     return item;
   }
-
   update(level?: GameObject[]) {
+    level = level.filter(
+      (object) =>
+        object.id !== this.id &&
+        object.id !== this.item?.id &&
+        this.id !== object.item?.id
+    );
     this.accelerate();
-    this.move();
+    this.move(level);
     this.updateOffset();
 
     if (this.controller.action) {

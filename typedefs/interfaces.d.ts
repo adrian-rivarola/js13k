@@ -18,6 +18,7 @@ interface GameObject {
   id: string;
   type: string;
   active: boolean;
+  preventCollision: boolean;
 
   scale: number;
   rotation?: number;
@@ -41,13 +42,14 @@ interface GameObject {
 
   update(level?: GameObject[]): GameObject;
   render(ctx: Ctx): void;
+  renderDetails(ctx: Ctx): void;
 }
 
 interface Player extends GameObject {
   vel: Vector;
   maxSpeed: number;
 
-  move(): void;
+  move(level: GameObject[]): void;
   pickItem(item: GameObject): void;
   releaseItem(isActive?: boolean): GameObject;
 }

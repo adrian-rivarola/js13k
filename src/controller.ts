@@ -1,9 +1,11 @@
 const KEYBOARD: Record<string, { state: boolean; active: boolean }> = {};
 
 onkeydown = onkeyup = (ev) => {
+  const key = ev.key.toLowerCase();
   const newState = ev.type[3] === "d";
-  if (newState !== KEYBOARD[ev.key]?.state) {
-    KEYBOARD[ev.key] = {
+
+  if (newState !== KEYBOARD[key]?.state) {
+    KEYBOARD[key] = {
       state: newState,
       active: newState,
     };

@@ -3,8 +3,9 @@ import { SCALE, TILE_SIZE } from "./setup";
 import ASSETS from "./assets";
 
 export default class implements GameObject {
-  pos: Vector = [0, 0];
+  pos: Vector;
   active = true;
+  preventCollision = false;
 
   asset?: HTMLImageElement;
   w = TILE_SIZE * 1.5;
@@ -22,9 +23,11 @@ export default class implements GameObject {
   constructor(
     public id: string,
     public type: string,
+    public gridPos: Vector,
     public color: Color = "white"
   ) {
     this.asset = ASSETS[type];
+    this.pos = gridPos.map((coord) => coord * TILE_SIZE) as Vector;
   }
 
   get center(): Vector {
@@ -34,6 +37,10 @@ export default class implements GameObject {
 
   get rotation() {
     return 0;
+  }
+
+  get gridP(): Vector {
+    return this.center.map((coor) => Math.floor(coor / TILE_SIZE)) as Vector;
   }
 
   onAction(player: Player) {
@@ -120,5 +127,17 @@ export default class implements GameObject {
     this.renderDetails(ctx);
 
     ctx.restore();
+
+    // ctx.save();
+    // const [gx, gy] = this.gridPos;
+    // ctx.translate(
+    //   gx * TILE_SIZE + TILE_SIZE / 2,
+    //   gy * TILE_SIZE + TILE_SIZE / 2
+    // );
+    // ctx.beginPath();
+    // ctx.arc(0, 0, 2, 0, Math.PI * 2);
+    // ctx.fillStyle = "white";
+    // ctx.fill();
+    // ctx.restore();
   }
 }

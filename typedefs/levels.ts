@@ -14,7 +14,7 @@ interface ServerConfig {
 }
 
 interface LevelConfig {
-  providers: ProviderConfig[];
-  painters: PainterConfig[];
-  servers: ServerConfig[];
+  providers: Vector[];
+  painters: Vector[];
+  servers: Vector[];
 }

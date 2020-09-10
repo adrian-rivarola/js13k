@@ -1,5 +1,4 @@
 import ASSETS from "./assets";
-import LEVELS from "./levels/";
 
 import { createLevel } from "./levels/setup";
 
@@ -22,10 +21,10 @@ const game: GameState = {
   objects: [],
 
   init(level = 0) {
-    level %= LEVELS.length;
-
     game.objects = [...game.players];
-    createLevel(LEVELS[level], game.objects);
+
+    createLevel(level, game.objects);
+    console.log(game.objects);
   },
   onResize(scaleTo: number) {
     game.objects.forEach((object) => object.onResize(scaleTo));
