@@ -1,5 +1,5 @@
 import GameObjectClass from "./gameObject";
-import { SCALE, TILE_SIZE } from "./setup";
+import { TILE_SIZE } from "./setup";
 // import { getDistance } from "./utils";
 // import { ctx } from "./index";
 
@@ -15,7 +15,8 @@ class Modifier extends GameObjectClass {
 
     this.pos[0] = position[0] * TILE_SIZE;
     this.pos[1] = position[1] * TILE_SIZE;
-    this.scale = SCALE;
+
+    console.log({ id, position });
 
     this.onAction = (player: Player) => actionCommand(player);
   }
@@ -41,8 +42,11 @@ export function createItemProvider(
 export function createPainter({ color, pos }: PainterConfig) {
   const command: Command = (player: Player) => player.item?.setColor(color);
 
-  let id = typeof color === "string" ? color : "painter";
-  return new Modifier(id, pos, command, color);
+  let id =
+    typeof color === "string"
+      ? color[0].toUpperCase() + color.substring(1)
+      : "";
+  return new Modifier(id + " Painter", pos, command, color);
 }
 
 export function createStorageServer({ pos, capacity = 3 }: ServerConfig) {
@@ -67,11 +71,11 @@ export function createStorageServer({ pos, capacity = 3 }: ServerConfig) {
   server = new Modifier("0/" + capacity, pos, command, "grey");
 
   server.renderDetails = function (ctx: Ctx) {
-    ctx.translate(4, 4);
+    ctx.translate(8, 6);
 
     storage.forEach((object, idx) => {
       ctx.fillStyle = object.color;
-      ctx.fillRect(0, idx * 5, server.w - 8, 4);
+      ctx.fillRect(0, idx * 6, server.w * 0.4, 4);
     });
   };
 

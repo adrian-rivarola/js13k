@@ -2,7 +2,7 @@
 
 export let canvas: HTMLCanvasElement;
 export let ctx: Ctx;
-export let SCALE: number = 1;
+export let SCALE: number;
 export let TILE_SIZE: number;
 
 export function createCanvas() {
@@ -13,7 +13,9 @@ export function createCanvas() {
 
   SCALE = canvas.width / 512;
 
-  document.body.innerHTML = "";
+  // document.body.innerHTML = "";
+  // (document.querySelector(".main-menu") as HTMLDivElement).style.display =
+  //   "none";
   document.body.appendChild(canvas);
 
   return { canvas, ctx };

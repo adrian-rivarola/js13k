@@ -1,9 +1,11 @@
 import robotB from "../assets/robot.png";
 import robotA from "../assets/hands.png";
-import floorImg from "../assets/floor.png";
+import floor from "../assets/floor.png";
+import modifier from "../assets/modifier.png";
 
 const images: Record<string, HTMLImageElement> = {
   floor: new Image(),
+  modifier: new Image(),
   player: new Image(),
   playerArms: new Image(),
 };
@@ -20,7 +22,8 @@ export function loadAssets(): Promise<Record<string, HTMLImageElement>> {
       images[key].onerror = reject;
     }
 
-    images.floor.src = floorImg;
+    images.floor.src = floor;
+    images.modifier.src = modifier;
     images.player.src = robotB;
     images.playerArms.src = robotA;
   });

@@ -8,7 +8,7 @@ export default class implements GameObject {
 
   asset?: HTMLImageElement;
   w = TILE_SIZE * 1.5;
-  h = TILE_SIZE * 0.5;
+  h = TILE_SIZE * 0.25;
 
   hue = 0;
   scale = SCALE;
@@ -46,6 +46,9 @@ export default class implements GameObject {
     this.scale *= scaleTo;
     this.w *= scaleTo;
     this.h *= scaleTo;
+
+    this.pos[0] *= scaleTo;
+    this.pos[1] *= scaleTo;
   }
 
   setColor(newColor: Color) {
@@ -82,28 +85,27 @@ export default class implements GameObject {
 
   renderId(ctx: Ctx) {
     ctx.textAlign = "center";
-    ctx.font = "bold 12px monospace";
+    ctx.font = "bold 0.75rem monospace";
     ctx.fillText(this.id, this.w * 0.5, this.h + 14);
   }
 
   renderDetails(ctx: Ctx) {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 1;
-    ctx.strokeRect(0, 0, this.w, this.h);
+    ctx.strokeRect(0, 0, this.w / this.scale, this.h / this.scale);
   }
 
   render(ctx: Ctx) {
     let [x, y] = this.pos;
 
     ctx.save();
-
     ctx.translate(x, y + this.offset);
+
     ctx.fillStyle = this.color;
     !this.owner && this.renderId(ctx);
 
     ctx.scale(this.scale, this.scale);
     if (this.rotation) {
-      // rotate image and elevate shoulder
       ctx.rotate(this.rotation);
       ctx.translate(0, -20 * this.rotation);
     }
@@ -113,7 +115,7 @@ export default class implements GameObject {
 
     this.asset
       ? ctx.drawImage(this.asset, 0, 0)
-      : ctx.fillRect(0, 0, this.w, this.h);
+      : ctx.fillRect(0, 0, this.w / this.scale, this.h / this.scale);
 
     this.renderDetails(ctx);
 

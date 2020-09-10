@@ -1,23 +1,23 @@
 let capacity = 4;
 
 const level0: LevelConfig = {
-  providers: [{ itemId: "<HelloWorld />", pos: [3, 7] }],
-  painters: [{ color: "teal", pos: [12, 7] }],
+  providers: [{ itemId: "<HelloWorld />", pos: [1, 3] }],
+  painters: [{ color: "teal", pos: [14, 3] }],
   // servers: [{ pos: [7.5, 12], capacity: 1 }],
   servers: [],
 };
 
 const level1: LevelConfig = {
   providers: [
-    { itemId: "<Title />", pos: [14, 1] },
-    { itemId: "<Image />", pos: [14, 3] },
-    { itemId: "<Div />", pos: [14, 5] },
+    { itemId: "<Header />", pos: [14, 4] },
+    { itemId: "<Image />", pos: [14, 7] },
+    { itemId: "<Div />", pos: [14, 10] },
     // { itemId: "<Footer />", pos: [14, 7] },
   ],
   painters: [
-    { color: "purple", pos: [2, 1] },
-    { color: "yellow", pos: [2, 3] },
-    { color: "teal", pos: [2, 5] },
+    { color: "crimson", pos: [2, 4] },
+    { color: "yellow", pos: [2, 7] },
+    { color: "teal", pos: [2, 10] },
     // { color: "orange", pos: [14, 7] },
   ],
   servers: [

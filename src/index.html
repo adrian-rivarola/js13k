@@ -15,21 +15,12 @@
       }
       body {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         justify-content: center;
         align-items: center;
         background-color: #333;
       }
-      #game {
-        opacity: 0;
-        transition: opacity 3s;
-      }
-      #game.loaded {
-        opacity: 1;
-      }
-      .hide {
-        display: none;
-      }
+
       div .vc {
         width: 32px;
         height: 32px;
@@ -41,15 +32,6 @@
       }
       .error {
         display: none;
-      }
-      .main-menu {
-        text-align: center;
-        width: 50%;
-        color: white;
-      }
-      #start-button {
-        padding: 1rem 3rem;
-        margin: 2rem;
       }
       @media only screen and (max-height: 420px) {
         .error {
@@ -63,9 +45,6 @@
   </head>
   <body>
     <div class="error">:(</div>
-    <div class="main-menu">
-      <button id="start-button">Start!</button>
-    </div>
   </body>
   <script type="text/javascript">
     (function () {

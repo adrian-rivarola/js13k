@@ -1,25 +1,27 @@
 import GameObject from "./gameObject";
 import ASSETS from "./assets";
 
+import { TILE_SIZE } from "./setup";
+
 import { clamp, addVectors, getHueRotation } from "./utils";
 
 export default class extends GameObject implements Player {
   vel: Vector = [0, 0];
   item?: GameObject;
-  arms: HTMLImageElement;
 
-  maxSpeed = 2;
+  maxSpeed = TILE_SIZE / 16;
   acc = 0.2;
 
-  scope = 40;
+  scope = TILE_SIZE * 1.5;
 
   constructor(id: string, color: Color, public controller: Controller) {
     super(id, "player", color);
 
-    this.arms = ASSETS.playerArms;
+    this.scale *= 0.8;
+    this.w = ASSETS.playerArms.width * this.scale;
+    this.h = ASSETS.player.height * this.scale;
 
-    this.w = ASSETS.playerArms.width;
-    this.h = ASSETS.player.height;
+    this.maxSpeed *= this.scale;
 
     this.hue = getHueRotation(color);
   }
@@ -41,9 +43,6 @@ export default class extends GameObject implements Player {
   }
 
   onResize(scaleTo: number) {
-    // this.scale *= scale;
-    // this.w *= scale;
-    // this.h *= scale;
     super.onResize(scaleTo);
 
     this.maxSpeed *= scaleTo;
@@ -121,6 +120,6 @@ export default class extends GameObject implements Player {
     } else {
       ctx.translate(0, this.h * 0.25);
     }
-    ctx.drawImage(this.arms, 0, 0);
+    ctx.drawImage(ASSETS.playerArms, 0, 0);
   }
 }
