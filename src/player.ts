@@ -3,7 +3,7 @@ import ASSETS from "./assets";
 
 import { TILE_SIZE } from "./setup";
 
-import { clamp, addVectors, getDistance, getHueRotation } from "./utils";
+import { clamp, addVectors, getDistance, HUE_MAP } from "./utils";
 
 export default class extends GameObject implements Player {
   vel: Vector = [0, 0];
@@ -16,7 +16,7 @@ export default class extends GameObject implements Player {
   constructor(
     id: string,
     gridPos: Vector,
-    color: Color,
+    color: string,
     public controller: Controller
   ) {
     super(id, "player", gridPos, color);
@@ -27,7 +27,7 @@ export default class extends GameObject implements Player {
 
     this.maxSpeed *= this.scale;
 
-    this.hue = getHueRotation(color);
+    this.hue = HUE_MAP[color] || 0;
   }
 
   get rotation() {
@@ -37,13 +37,11 @@ export default class extends GameObject implements Player {
     return 0;
   }
 
-  setColor(newColor: Color) {
-    let newHue = getHueRotation(newColor);
-
-    if (newHue !== -1) {
-      this.hue = newHue;
+  setColor(newColor: string) {
+    if (HUE_MAP[newColor]) {
+      this.hue = HUE_MAP[newColor];
       super.setColor(newColor);
-    } else console.log(`${this.id} cannot be painted in ${newColor}`);
+    }
   }
 
   onResize(scaleTo: number) {
@@ -70,13 +68,15 @@ export default class extends GameObject implements Player {
   move(level: GameObject[]) {
     const nextPos = addVectors(this.pos, this.vel);
 
-    let collision = level.some(
-      (object) =>
-        object.preventCollision &&
-        getDistance(object.pos, nextPos) < TILE_SIZE * 0.9
-    );
+    if (!this.owner) {
+      let collision = level.some(
+        (object) =>
+          object.preventCollision &&
+          getDistance(object.pos, nextPos) < TILE_SIZE * 0.9
+      );
 
-    if (collision) return;
+      if (collision) return;
+    }
 
     this.pos = nextPos;
     if (this.item) {
@@ -87,7 +87,7 @@ export default class extends GameObject implements Player {
   }
 
   pickItem(item: GameObject) {
-    console.log(`${this.id} picked ${item.id}`);
+    // console.log(`${this.id} picked ${item.id}`);
 
     item.owner = this;
     item.active = true;
@@ -103,17 +103,16 @@ export default class extends GameObject implements Player {
     item.owner = null;
 
     this.item = null;
-    console.log(`${this.id} released ${item.id}`);
+    // console.log(`${this.id} released ${item.id}`);
 
     return item;
   }
   update(level?: GameObject[]) {
     level = level.filter(
       (object) =>
-        object.id !== this.id &&
-        object.id !== this.item?.id &&
-        this.id !== object.item?.id
+        object.id !== this.id && !object.owner && this.id !== object.item?.id
     );
+
     this.accelerate();
     this.move(level);
     this.updateOffset();

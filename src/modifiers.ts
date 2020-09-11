@@ -8,11 +8,12 @@ class Modifier extends GameObjectClass {
 
   constructor(
     id: string,
+    type: string,
     position: Vector,
     actionCommand: Command,
     color?: Color
   ) {
-    super(id, "modifier", position, color);
+    super(id, type, position, color);
     this.w = this.h = TILE_SIZE;
 
     this.onAction = (player: Player) => actionCommand(player);
@@ -34,13 +35,13 @@ export function createItemProvider(
     level.push(newItem);
   };
 
-  return new Modifier(itemId, pos, command);
+  return new Modifier(itemId, "modifier", pos, command);
 }
 
 export function createPainter(pos: Vector, color: string) {
   const command: Command = (player: Player) => player.item?.setColor(color);
 
-  return new Modifier("Painter", pos, command, color);
+  return new Modifier("Painter", "painter", pos, command, color);
 }
 
 export function createStorageServer(pos: Vector) {
@@ -63,14 +64,14 @@ export function createStorageServer(pos: Vector) {
     server.id = `${storage.length}/${capacity}`;
   }
 
-  server = new Modifier("0/" + capacity, pos, command, "grey");
+  server = new Modifier("0/" + capacity, "server", pos, command, "grey");
 
   server.renderDetails = function (ctx: Ctx) {
-    ctx.translate(8, 6);
+    ctx.translate(4, 4);
 
     storage.forEach((object, idx) => {
       ctx.fillStyle = object.color;
-      ctx.fillRect(0, idx * 6, server.w * 0.25, 4);
+      ctx.fillRect(0, idx * 8, server.w - 8, 6);
     });
   };
 
@@ -90,7 +91,7 @@ export function createTrahsCan(pos: Vector, level: GameObject[]) {
     }
   }
 
-  return new Modifier("TrashCan", pos, command, "purple");
+  return new Modifier("TrashCan", "trashcan", pos, command, "purple");
 }
 
 // export function createSpeedBooster() {

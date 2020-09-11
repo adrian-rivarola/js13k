@@ -6,8 +6,14 @@ import {
   createStorageServer,
 } from "./modifiers";
 
-export const COLORS = ["#80ffdb", "#e63946", "#fca311", "#f4a261", "#e76f51"];
-export const ITEMS = ["<Article />", "<div/>", "<Image/>", "<helloWorld />"];
+export const COLORS = ["#80ffdb", "#e63946", "#fca311", "blue", "green"];
+export const ITEMS = [
+  "<Title/>",
+  "<Article/>",
+  "<div/>",
+  "<Image/>",
+  "<Link/>",
+];
 
 class Game implements GameState {
   isPaused = false;
@@ -27,8 +33,8 @@ class Game implements GameState {
       createItemProvider([2, 2 + idx * 2], itemId, this.objects)
     );
 
-    const painters = config.painters.map((pos, idx) =>
-      createPainter(pos, COLORS[idx])
+    const painters = COLORS.map((color, idx) =>
+      createPainter([13, 2 + idx * 2], color)
     );
 
     const servers = config.servers.map(createStorageServer);

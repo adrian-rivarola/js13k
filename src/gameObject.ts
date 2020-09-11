@@ -65,11 +65,8 @@ export default class implements GameObject {
   getClosestObject(level: GameObject[]): [GameObject, number] {
     let result: [GameObject, number] = [null, 1000];
 
-    // filter valid targets
-    const invalidIds = [this.id, this.item?.id, this.owner?.id];
-    level = level.filter(
-      (obj) => obj.active && !obj.owner && !invalidIds.includes(obj.id)
-    );
+    // remove invalid targets
+    level = level.filter((obj) => obj.active && !obj.owner);
 
     level.forEach((object) => {
       let distance = getDistance(this.center, object.center);
