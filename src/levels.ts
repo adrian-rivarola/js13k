@@ -6,14 +6,14 @@ const level0: LevelConfig = {
 
 const level1: LevelConfig = {
   providers: [
-    [3, 5],
-    [3, 7],
-    [3, 9],
+    [2, 5],
+    [2, 7],
+    [2, 9],
   ],
   painters: [
-    [12, 5],
-    [12, 7],
-    [12, 9],
+    [13, 5],
+    [13, 7],
+    [13, 9],
   ],
   servers: [
     [6, 13],

@@ -1,41 +1,71 @@
 import ASSETS from "./assets";
+import LEVELS from "./levels";
+import {
+  createPainter,
+  createItemProvider,
+  createStorageServer,
+} from "./modifiers";
 
-import { createLevel } from "./levels/setup";
+export const COLORS = ["#80ffdb", "#e63946", "#fca311", "#f4a261", "#e76f51"];
+export const ITEMS = ["<Article />", "<div/>", "<Image/>", "<helloWorld />"];
 
-function drawFloor(ctx: Ctx) {
-  let s = ctx.canvas.width;
+class Game implements GameState {
+  isPaused = false;
+  level = -1;
 
-  ctx.save();
-  ctx.drawImage(ASSETS.floor, 0, 0, s, s);
+  players: Player[] = [];
+  objects: GameObject[] = [];
 
-  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-  ctx.fillRect(0, 0, s, s);
+  objectives: GameObject[] = [];
 
-  ctx.restore();
+  loadLevel(level: number) {
+    const config = LEVELS[level];
+
+    this.objects = [...this.players];
+
+    const providers = ITEMS.map((itemId, idx) =>
+      createItemProvider([2, 2 + idx * 2], itemId, this.objects)
+    );
+
+    const painters = config.painters.map((pos, idx) =>
+      createPainter(pos, COLORS[idx])
+    );
+
+    const servers = config.servers.map(createStorageServer);
+
+    this.objects.unshift(...providers, ...painters, ...servers);
+  }
+
+  resize(scaleTo: number) {
+    this.objects.forEach((object) => object.onResize(scaleTo));
+  }
+
+  drawFloor(ctx: Ctx) {
+    let s = ctx.canvas.width;
+
+    ctx.save();
+    ctx.drawImage(ASSETS.floor, 0, 0, s, s);
+
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, s, s);
+
+    ctx.restore();
+  }
+
+  render(ctx: Ctx) {
+    if (this.isPaused) {
+      ctx.fillStyle = "white";
+      ctx.font = "2rem monospace";
+      ctx.fillText("Game Paused", 15, 30);
+      return;
+    }
+
+    this.drawFloor(ctx);
+
+    this.objects.forEach((object) => {
+      object.active && object.update(this.objects).render(ctx);
+    });
+  }
 }
 
-const game: GameState = {
-  isPaused: false,
-  levelId: -1,
-  players: [],
-  objects: [],
-
-  init(level = 0) {
-    game.objects = [...game.players];
-
-    createLevel(level, game.objects);
-    console.log(game.objects);
-  },
-  onResize(scaleTo: number) {
-    game.objects.forEach((object) => object.onResize(scaleTo));
-  },
-  render(ctx: Ctx) {
-    drawFloor(ctx);
-
-    game.objects.forEach((object) => {
-      object.active && object.update(game.objects).render(ctx);
-    });
-  },
-};
-
-export default game;
+export default new Game();

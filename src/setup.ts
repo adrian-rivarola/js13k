@@ -1,3 +1,5 @@
+import game from "./game";
+
 export let canvas: HTMLCanvasElement;
 export let ctx: Ctx;
 export let SCALE: number;
@@ -20,7 +22,7 @@ export function createCanvas() {
   return { canvas, ctx };
 }
 
-export function onResize(game: GameState) {
+export function onResize() {
   MAP_SIZE = Math.min(innerWidth, innerHeight);
   MAP_SIZE -= MAP_SIZE % 32;
 
@@ -30,5 +32,5 @@ export function onResize(game: GameState) {
   SCALE = MAP_SIZE / 512;
   TILE_SIZE = MAP_SIZE / 16;
 
-  game.onResize(SCALE / oldScale);
+  game.resize(SCALE / oldScale);
 }

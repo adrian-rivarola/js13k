@@ -99,7 +99,7 @@ export default class implements GameObject {
   renderDetails(ctx: Ctx) {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 1;
-    ctx.strokeRect(0, 0, this.w / this.scale, this.h / this.scale);
+    ctx.strokeRect(0, 0, this.w, this.h);
   }
 
   render(ctx: Ctx) {
@@ -111,7 +111,6 @@ export default class implements GameObject {
     ctx.fillStyle = this.color;
     !this.owner && this.renderId(ctx);
 
-    ctx.scale(this.scale, this.scale);
     if (this.rotation) {
       ctx.rotate(this.rotation);
       ctx.translate(0, -20 * this.rotation);
@@ -121,23 +120,11 @@ export default class implements GameObject {
       ctx.filter = `contrast(1.1) hue-rotate(${this.hue}deg)`;
 
     this.asset
-      ? ctx.drawImage(this.asset, 0, 0)
-      : ctx.fillRect(0, 0, this.w / this.scale, this.h / this.scale);
+      ? ctx.drawImage(this.asset, 0, 0, this.w, this.h)
+      : ctx.fillRect(0, 0, this.w, this.h);
 
     this.renderDetails(ctx);
 
     ctx.restore();
-
-    // ctx.save();
-    // const [gx, gy] = this.gridPos;
-    // ctx.translate(
-    //   gx * TILE_SIZE + TILE_SIZE / 2,
-    //   gy * TILE_SIZE + TILE_SIZE / 2
-    // );
-    // ctx.beginPath();
-    // ctx.arc(0, 0, 2, 0, Math.PI * 2);
-    // ctx.fillStyle = "white";
-    // ctx.fill();
-    // ctx.restore();
   }
 }

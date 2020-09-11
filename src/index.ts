@@ -8,19 +8,19 @@ import game from "./game";
 onload = () => {
   const { ctx } = createCanvas();
 
-  const start = () => {
-    requestAnimationFrame(start);
+  const loop = () => {
+    requestAnimationFrame(loop);
     game.render(ctx);
   };
 
-  onresize = () => onResize(game);
-  onResize(game);
+  onresize = onResize;
+  onResize();
 
   loadAssets().then(() => {
     game.players = createPlayers();
-    game.init(1);
+    game.loadLevel(1);
 
-    start();
+    loop();
   });
 };
 

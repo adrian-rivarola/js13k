@@ -75,6 +75,7 @@ export default class extends GameObject implements Player {
         object.preventCollision &&
         getDistance(object.pos, nextPos) < TILE_SIZE * 0.9
     );
+
     if (collision) return;
 
     this.pos = nextPos;
@@ -132,11 +133,11 @@ export default class extends GameObject implements Player {
   renderDetails(ctx: Ctx) {
     if (this.item) {
       // raise hands
-      ctx.translate(0, this.h * 0.5);
+      ctx.translate(0, this.h * 0.75);
       ctx.scale(1, -1);
     } else {
       ctx.translate(0, this.h * 0.25);
     }
-    ctx.drawImage(ASSETS.playerArms, 0, 0);
+    ctx.drawImage(ASSETS.playerArms, 0, 0, this.w, this.h);
   }
 }

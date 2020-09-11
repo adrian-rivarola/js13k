@@ -5,12 +5,11 @@ type Vector = [number, number];
 
 interface GameState {
   isPaused: boolean;
-  levelId: number;
+  level: number;
   objects: GameObject[];
   players: Player[];
 
-  init(level?: number): void;
-  onResize(scaleTo: number): void;
+  resize(scaleTo: number): void;
   render(ctx: Ctx): void;
 }
 
