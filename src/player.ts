@@ -1,7 +1,7 @@
 import GameObject from "./gameObject";
 import ASSETS from "./assets";
 
-import { TILE_SIZE } from "./setup";
+import { TILE_SIZE, MAP_SIZE } from "./setup";
 
 import { clamp, addVectors, getDistance, HUE_MAP } from "./utils";
 
@@ -66,6 +66,8 @@ export default class extends GameObject implements Player {
   }
 
   move(level: GameObject[]) {
+    this.accelerate();
+
     const nextPos = addVectors(this.pos, this.vel);
 
     if (!this.owner) {
@@ -78,7 +80,10 @@ export default class extends GameObject implements Player {
       if (collision) return;
     }
 
-    this.pos = nextPos;
+    this.pos = nextPos.map((coord) =>
+      clamp(0, MAP_SIZE - this.w, coord)
+    ) as Vector;
+
     if (this.item) {
       this.item.pos = [...this.pos];
       this.item.pos[0] += (this.w - this.item.w) / 2;
@@ -113,7 +118,6 @@ export default class extends GameObject implements Player {
         object.id !== this.id && !object.owner && this.id !== object.item?.id
     );
 
-    this.accelerate();
     this.move(level);
     this.updateOffset();
 

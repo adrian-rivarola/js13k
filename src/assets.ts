@@ -3,7 +3,7 @@ import robotA from "../assets/hands.png";
 import floor from "../assets/floor.png";
 import modifier from "../assets/modifier.png";
 
-const images: Record<string, HTMLImageElement> = {
+const images = {
   floor: new Image(),
   modifier: new Image(),
   player: new Image(),

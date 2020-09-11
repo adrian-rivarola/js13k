@@ -1,5 +1,7 @@
 import ASSETS from "./assets";
 import LEVELS from "./levels";
+
+import { displayMessage } from "./toast";
 import {
   createPainter,
   createItemProvider,
@@ -25,6 +27,7 @@ class Game implements GameState {
   objectives: GameObject[] = [];
 
   loadLevel(level: number) {
+    this.level = level;
     const config = LEVELS[level];
 
     this.objects = [...this.players];
@@ -40,25 +43,19 @@ class Game implements GameState {
     const servers = config.servers.map(createStorageServer);
 
     this.objects.unshift(...providers, ...painters, ...servers);
+
+    displayMessage(config.message, 4000);
   }
 
   resize(scaleTo: number) {
     this.objects.forEach((object) => object.onResize(scaleTo));
   }
 
-  drawFloor(ctx: Ctx) {
-    let s = ctx.canvas.width;
-
-    ctx.save();
-    ctx.drawImage(ASSETS.floor, 0, 0, s, s);
-
-    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-    ctx.fillRect(0, 0, s, s);
-
-    ctx.restore();
-  }
-
   render(ctx: Ctx) {
+    if (this.level === -1) {
+      return drawMainScreen(ctx);
+    }
+
     if (this.isPaused) {
       ctx.fillStyle = "white";
       ctx.font = "2rem monospace";
@@ -66,7 +63,7 @@ class Game implements GameState {
       return;
     }
 
-    this.drawFloor(ctx);
+    drawFloor(ctx);
 
     this.objects.forEach((object) => {
       object.active && object.update(this.objects).render(ctx);
@@ -74,4 +71,24 @@ class Game implements GameState {
   }
 }
 
-export default new Game();
+function drawMainScreen(ctx: Ctx) {
+  ctx.save();
+  drawFloor(ctx);
+
+  ctx.restore();
+}
+
+function drawFloor(ctx: Ctx) {
+  let s = ctx.canvas.width;
+
+  ctx.save();
+  ctx.drawImage(ASSETS.floor, 0, 0, s, s);
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.fillRect(0, 0, s, s);
+
+  ctx.restore();
+}
+
+const game = new Game();
+export default game;

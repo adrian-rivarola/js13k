@@ -17,4 +17,5 @@ interface LevelConfig {
   providers: Vector[];
   painters: Vector[];
   servers: Vector[];
+  message: string;
 }

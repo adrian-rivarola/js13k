@@ -89,7 +89,7 @@ export default class implements GameObject {
 
   renderId(ctx: Ctx) {
     ctx.textAlign = "center";
-    ctx.font = "bold 0.75rem monospace";
+    ctx.font = "bold 1rem monospace";
     ctx.fillText(this.id, this.w * 0.5, this.h + 14);
   }
 

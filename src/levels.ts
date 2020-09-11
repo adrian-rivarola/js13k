@@ -1,6 +1,7 @@
 const level0: LevelConfig = {
   providers: [[1, 3]],
   painters: [[14, 3]],
+  message: "Welcome to level #0",
   servers: [],
 };
 
@@ -15,6 +16,7 @@ const level1: LevelConfig = {
     [13, 7],
     [13, 9],
   ],
+  message: "Welcome to level #1",
   servers: [
     [6, 13],
     [9, 13],
@@ -34,6 +36,7 @@ const level2: LevelConfig = {
     [14, 5],
     [14, 7],
   ],
+  message: "Welcome to level #2",
   servers: [
     [5, 13],
     [7.5, 13],

@@ -5,6 +5,9 @@ import Player from "./player";
 import { KeyboardController, VirtualController } from "./controller";
 import game from "./game";
 
+const mainDiv = document.getElementById("game"),
+  gameForm = document.forms[0];
+
 onload = () => {
   const { ctx } = createCanvas();
 
@@ -13,15 +16,20 @@ onload = () => {
     game.render(ctx);
   };
 
-  onresize = onResize;
+  window.onresize = onResize;
   onResize();
 
   loadAssets().then(() => {
-    game.players = createPlayers();
-    game.loadLevel(1);
-
     loop();
   });
+
+  gameForm.onsubmit = (ev) => {
+    ev.preventDefault();
+    mainDiv.style.display = "none";
+
+    game.players = createPlayers();
+    game.loadLevel(1);
+  };
 };
 
 function createPlayers() {
