@@ -1,46 +1,52 @@
 import ASSETS from "./assets";
 import LEVELS from "./levels";
+import { TILE_SIZE } from "./setup";
 
 import { displayMessage } from "./toast";
+
 import {
   createPainter,
   createItemProvider,
   createStorageServer,
-} from "./modifiers";
+} from "./modifiers/";
 
-export const COLORS = ["#80ffdb", "#e63946", "#fca311", "blue", "green"];
-export const ITEMS = [
-  "<Title/>",
-  "<Article/>",
-  "<div/>",
-  "<Image/>",
-  "<Link/>",
-];
+import { createRandomObjective } from "./utils";
 
 class Game implements GameState {
   isPaused = false;
+  levelCompleted = false;
   level = -1;
 
   players: Player[] = [];
   objects: GameObject[] = [];
 
-  objectives: GameObject[] = [];
+  objectives: Objective[] = [];
 
   loadLevel(level: number) {
-    this.level = level;
-    const config = LEVELS[level];
-
+    this.level = level % LEVELS.length;
     this.objects = [...this.players];
+    this.levelCompleted = false;
+    this.isPaused = false;
 
-    const providers = ITEMS.map((itemId, idx) =>
-      createItemProvider([2, 2 + idx * 2], itemId, this.objects)
+    this.players.forEach((player) => player.resetPos());
+
+    const config = LEVELS[this.level];
+
+    const providers = config.providers.map((pos, idx) =>
+      createItemProvider(pos, config.items[idx])
     );
 
-    const painters = COLORS.map((color, idx) =>
-      createPainter([13, 2 + idx * 2], color)
+    const painters = config.painters.map((pos, idx) =>
+      createPainter(pos, config.colors[idx])
     );
 
-    const servers = config.servers.map(createStorageServer);
+    this.objectives = config.servers.map((el, idx) =>
+      createRandomObjective(config.items, config.colors)
+    );
+
+    const servers = this.objectives.map((objective, idx) =>
+      createStorageServer(config.servers[idx], objective)
+    );
 
     this.objects.unshift(...providers, ...painters, ...servers);
 
@@ -51,31 +57,68 @@ class Game implements GameState {
     this.objects.forEach((object) => object.onResize(scaleTo));
   }
 
+  renderObjectives(ctx: Ctx) {
+    ctx.save();
+
+    ctx.textAlign = "center";
+    ctx.font = "14px bold";
+
+    ctx.lineWidth = 3;
+    ctx.translate(0, 10);
+
+    this.objectives.forEach((objective, i) => {
+      ctx.translate(i > 0 ? TILE_SIZE * 2.5 : TILE_SIZE * 0.5, 0);
+
+      ctx.globalAlpha = objective.completed ? 0.5 : 1;
+
+      objective.components.forEach(({ itemId, color }, j) => {
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 18 * j, TILE_SIZE * 2, 18);
+
+        ctx.fillStyle = "black";
+        ctx.fillText(itemId, TILE_SIZE, (1 + j) * 16.5);
+      });
+
+      ctx.strokeStyle = objective.completed ? "lightgreen" : "black";
+      ctx.strokeRect(0, 0, TILE_SIZE * 2, objective.components.length * 18);
+    });
+
+    ctx.restore();
+  }
+
+  onObjectiveCompleted() {
+    this.levelCompleted = this.objectives.every(
+      (objective) => objective.completed
+    );
+
+    if (this.levelCompleted) {
+      displayMessage("Level Completed!", 5000);
+      setTimeout(() => this.loadLevel(this.level + 1), 6000);
+    }
+  }
+
   render(ctx: Ctx) {
+    drawFloor(ctx);
+
     if (this.level === -1) {
-      return drawMainScreen(ctx);
+      // drawFloor(ctx);
+      return;
     }
 
     if (this.isPaused) {
       ctx.fillStyle = "white";
+      ctx.textAlign = "center";
       ctx.font = "2rem monospace";
-      ctx.fillText("Game Paused", 15, 30);
+      ctx.fillText("Game Paused", ctx.canvas.width / 2, ctx.canvas.width / 2);
       return;
     }
 
-    drawFloor(ctx);
+    this.renderObjectives(ctx);
 
     this.objects.forEach((object) => {
       object.active && object.update(this.objects).render(ctx);
     });
   }
-}
-
-function drawMainScreen(ctx: Ctx) {
-  ctx.save();
-  drawFloor(ctx);
-
-  ctx.restore();
 }
 
 function drawFloor(ctx: Ctx) {

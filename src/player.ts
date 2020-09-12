@@ -8,7 +8,7 @@ import { clamp, addVectors, getDistance, HUE_MAP } from "./utils";
 export default class extends GameObject implements Player {
   vel: Vector = [0, 0];
   item?: GameObject;
-  maxSpeed = TILE_SIZE / 16;
+  maxSpeed = TILE_SIZE / 12;
   acc = 0.2;
 
   scope = TILE_SIZE * 1.5;
@@ -102,7 +102,7 @@ export default class extends GameObject implements Player {
     this.item = item;
   }
 
-  releaseItem(isActive = true): GameObject {
+  dropItem(isActive = true): GameObject {
     const item = this.item;
     item.active = isActive;
     item.owner = null;
@@ -128,7 +128,7 @@ export default class extends GameObject implements Player {
       if (dist < this.scope) target.onAction(this);
     }
 
-    if (this.item && this.controller.release) this.releaseItem();
+    if (this.item && this.controller.release) this.dropItem();
 
     return this;
   }

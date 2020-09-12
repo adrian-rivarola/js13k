@@ -17,3 +17,38 @@ export const HUE_MAP: Record<string, number> = {
   purple: 284,
   red: 1,
 };
+
+export function createRandomObjective(
+  items: string[],
+  colors: string[],
+  timeToComplete = 30000
+): Objective {
+  let randItems: number[] = [],
+    randColors: number[] = [],
+    idxItem: number,
+    idxColor: number,
+    size = items.length - Math.floor(Math.random() * items.length * 0.5);
+
+  const components: PageComponent[] = [];
+
+  for (let i = 0; i < size; i++) {
+    do {
+      idxItem = Math.floor(Math.random() * items.length);
+      idxColor = Math.floor(Math.random() * colors.length);
+    } while (randItems.includes(idxItem) || randColors.includes(idxColor));
+
+    randItems.push(idxItem);
+    randColors.push(idxColor);
+
+    components.push({
+      itemId: items[idxItem],
+      color: colors[idxColor],
+    });
+  }
+
+  return {
+    components,
+    timeToComplete,
+    completed: false,
+  };
+}

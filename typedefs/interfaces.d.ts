@@ -7,10 +7,23 @@ interface GameState {
   isPaused: boolean;
   level: number;
   objects: GameObject[];
+  objectives: Objective[];
   players: Player[];
 
+  onObjectiveCompleted(): void;
   resize(scaleTo: number): void;
   render(ctx: Ctx): void;
+}
+
+interface Objective {
+  components: PageComponent[];
+  completed: boolean;
+  timeToComplete: number;
+}
+
+interface PageComponent {
+  itemId: string;
+  color: string;
 }
 
 interface GameObject {
@@ -38,11 +51,15 @@ interface GameObject {
 
   onResize(scaleTo: number): void;
   setColor(newColor: Color): void;
+  resetPos(): void;
 
   update(level?: GameObject[]): GameObject;
   render(ctx: Ctx): void;
+  renderId(ctx: Ctx): void;
   renderDetails(ctx: Ctx): void;
 }
+
+interface Modifier extends GameObject {}
 
 interface Player extends GameObject {
   vel: Vector;
@@ -50,7 +67,7 @@ interface Player extends GameObject {
 
   move(level: GameObject[]): void;
   pickItem(item: GameObject): void;
-  releaseItem(isActive?: boolean): GameObject;
+  dropItem(isActive?: boolean): GameObject;
 }
 
 interface Controller {

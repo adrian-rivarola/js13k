@@ -28,7 +28,7 @@ onload = () => {
     mainDiv.style.display = "none";
 
     game.players = createPlayers();
-    game.loadLevel(1);
+    game.loadLevel(0);
   };
 };
 

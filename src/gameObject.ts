@@ -27,7 +27,7 @@ export default class implements GameObject {
     public color: Color = "white"
   ) {
     this.asset = ASSETS[type];
-    this.pos = gridPos.map((coord) => coord * TILE_SIZE) as Vector;
+    this.resetPos();
   }
 
   get center(): Vector {
@@ -41,6 +41,9 @@ export default class implements GameObject {
 
   get gridP(): Vector {
     return this.center.map((coor) => Math.floor(coor / TILE_SIZE)) as Vector;
+  }
+  resetPos() {
+    this.pos = this.gridPos.map((coord) => coord * TILE_SIZE) as Vector;
   }
 
   onAction(player: Player) {

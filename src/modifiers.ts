@@ -1,83 +1,3 @@
-import GameObjectClass from "./gameObject";
-import { TILE_SIZE } from "./setup";
-// import { getDistance } from "./utils";
-// import { ctx } from "./index";
-
-class Modifier extends GameObjectClass {
-  preventCollision = true;
-
-  constructor(
-    id: string,
-    type: string,
-    position: Vector,
-    actionCommand: Command,
-    color?: Color
-  ) {
-    super(id, type, position, color);
-    this.w = this.h = TILE_SIZE;
-
-    this.onAction = (player: Player) => actionCommand(player);
-  }
-
-  renderDetails(ctx: Ctx) {}
-}
-
-export function createItemProvider(
-  pos: Vector,
-  itemId: string,
-  level: GameObject[]
-) {
-  const command = (player: Player) => {
-    if (player.item) return;
-
-    let newItem = new GameObjectClass(itemId, "item", pos, "white");
-    player.pickItem(newItem);
-    level.push(newItem);
-  };
-
-  return new Modifier(itemId, "modifier", pos, command);
-}
-
-export function createPainter(pos: Vector, color: string) {
-  const command: Command = (player: Player) => player.item?.setColor(color);
-
-  return new Modifier("Painter", "painter", pos, command, color);
-}
-
-export function createStorageServer(pos: Vector) {
-  const storage: GameObject[] = [];
-  let capacity = 3;
-  let server: Modifier;
-
-  function command(player: Player) {
-    if (player.item) {
-      if (storage.length === capacity || player.item.item)
-        return console.log(`cannot store ${player.item.id}`);
-
-      storage.push(player.releaseItem(false));
-    } else if (storage.length) {
-      player.pickItem(storage.pop());
-    } else {
-      console.log("server is empty");
-    }
-
-    server.id = `${storage.length}/${capacity}`;
-  }
-
-  server = new Modifier("0/" + capacity, "server", pos, command, "grey");
-
-  server.renderDetails = function (ctx: Ctx) {
-    ctx.translate(4, 4);
-
-    storage.forEach((object, idx) => {
-      ctx.fillStyle = object.color;
-      ctx.fillRect(0, idx * 8, server.w - 8, 6);
-    });
-  };
-
-  return server;
-}
-
 export function createTrahsCan(pos: Vector, level: GameObject[]) {
   function command(player: Player) {
     if (!player.item || player.item.type === "player") return;
@@ -86,12 +6,12 @@ export function createTrahsCan(pos: Vector, level: GameObject[]) {
     if (idx !== -1) {
       console.log(`${player.item.id} deleted`);
 
-      player.releaseItem();
+      player.dropItem();
       level.splice(idx, 1);
     }
   }
 
-  return new Modifier("TrashCan", "trashcan", pos, command, "purple");
+  // return new Modifier("TrashCan", "trashcan", pos, command, "purple");
 }
 
 // export function createSpeedBooster() {
