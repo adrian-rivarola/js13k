@@ -5,6 +5,7 @@ import { TILE_SIZE } from "./setup";
 import { displayMessage } from "./toast";
 
 import {
+  createBug,
   createPainter,
   createItemProvider,
   createStorageServer,
@@ -26,7 +27,6 @@ class Game implements GameState {
     this.level = level % LEVELS.length;
     this.objects = [...this.players];
     this.levelCompleted = false;
-    this.isPaused = false;
 
     this.players.forEach((player) => player.resetPos());
 
@@ -40,7 +40,7 @@ class Game implements GameState {
       createPainter(pos, config.colors[idx])
     );
 
-    this.objectives = config.servers.map((el, idx) =>
+    this.objectives = config.servers.map(() =>
       createRandomObjective(config.items, config.colors)
     );
 
@@ -48,7 +48,9 @@ class Game implements GameState {
       createStorageServer(config.servers[idx], objective)
     );
 
-    this.objects.unshift(...providers, ...painters, ...servers);
+    const bugs = config.bugs.map(createBug);
+
+    this.objects.unshift(...providers, ...painters, ...servers, ...bugs);
 
     displayMessage(config.message, 4000);
   }
@@ -101,7 +103,6 @@ class Game implements GameState {
     drawFloor(ctx);
 
     if (this.level === -1) {
-      // drawFloor(ctx);
       return;
     }
 
@@ -127,8 +128,8 @@ function drawFloor(ctx: Ctx) {
   ctx.save();
   ctx.drawImage(ASSETS.floor, 0, 0, s, s);
 
-  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-  ctx.fillRect(0, 0, s, s);
+  // ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  // ctx.fillRect(0, 0, s, s);
 
   ctx.restore();
 }

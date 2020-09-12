@@ -41,6 +41,8 @@ interface GameObject {
   w: number;
   h: number;
 
+  offset: number;
+  offsetDirection: number;
   color: Color;
   item?: GameObject;
   owner?: GameObject;

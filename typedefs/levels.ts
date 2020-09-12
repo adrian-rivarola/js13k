@@ -5,4 +5,5 @@ interface LevelConfig {
   painters: Vector[];
   servers: Vector[];
   message: string;
+  bugs: Vector[];
 }

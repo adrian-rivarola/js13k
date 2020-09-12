@@ -8,6 +8,8 @@ import game from "./game";
 const mainDiv = document.getElementById("game"),
   gameForm = document.forms[0];
 
+onblur = () => (game.isPaused = true);
+
 onload = () => {
   const { ctx } = createCanvas();
 

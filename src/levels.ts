@@ -11,28 +11,27 @@ const level0: LevelConfig = {
   message: "Welcome to level #0",
   items: ["< helloworld />"],
   colors: ["teal"],
+  bugs: [],
+  servers: [[2, 13]],
   providers: [[2, 7]],
   painters: [[13, 7]],
-  servers: [[2, 13]],
 };
 
 const level1: LevelConfig = {
   message: "Welcome to level #1",
-  items: ITEMS,
-  colors: COLORS,
+  items: ITEMS.slice(0, 3),
+  colors: COLORS.slice(0, 4),
+  bugs: [[13, 13]],
   providers: [
-    [2, 3],
     [2, 5],
     [2, 7],
     [2, 9],
-    [2, 11],
   ],
   painters: [
-    [13, 3],
-    [13, 5],
-    [13, 7],
-    [13, 9],
-    [13, 11],
+    [13, 4],
+    [13, 6],
+    [13, 8],
+    [13, 10],
   ],
   servers: [
     [6, 13],
@@ -44,6 +43,11 @@ const level2: LevelConfig = {
   message: "Welcome to level #2",
   items: ITEMS,
   colors: COLORS,
+  bugs: [
+    [1, 1],
+    [14, 14],
+    [1, 14],
+  ],
   providers: [
     [14, 3],
     [14, 5],

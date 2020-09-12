@@ -1,11 +1,11 @@
-import GameObject from "./gameObject";
+import GameObjectClass from "./gameObject";
 import ASSETS from "./assets";
 
 import { TILE_SIZE, MAP_SIZE } from "./setup";
 
 import { clamp, addVectors, getDistance, HUE_MAP } from "./utils";
 
-export default class extends GameObject implements Player {
+export default class extends GameObjectClass implements Player {
   vel: Vector = [0, 0];
   item?: GameObject;
   maxSpeed = TILE_SIZE / 12;
@@ -17,7 +17,7 @@ export default class extends GameObject implements Player {
     id: string,
     gridPos: Vector,
     color: string,
-    public controller: Controller
+    public controller?: Controller
   ) {
     super(id, "player", gridPos, color);
 
@@ -67,6 +67,7 @@ export default class extends GameObject implements Player {
 
   move(level: GameObject[]) {
     this.accelerate();
+    this.updateOffset();
 
     const nextPos = addVectors(this.pos, this.vel);
 
@@ -84,11 +85,13 @@ export default class extends GameObject implements Player {
       clamp(0, MAP_SIZE - this.w, coord)
     ) as Vector;
 
-    if (this.item) {
-      this.item.pos = [...this.pos];
-      this.item.pos[0] += (this.w - this.item.w) / 2;
-      this.item.pos[1] -= this.h;
-    }
+    this.item && this.moveItem();
+  }
+
+  moveItem() {
+    this.item.pos = [...this.pos];
+    this.item.pos[0] += (this.w - this.item.w) / 2;
+    this.item.pos[1] -= this.h;
   }
 
   pickItem(item: GameObject) {
@@ -103,6 +106,8 @@ export default class extends GameObject implements Player {
   }
 
   dropItem(isActive = true): GameObject {
+    if (!this.item) return;
+
     const item = this.item;
     item.active = isActive;
     item.owner = null;
@@ -119,7 +124,6 @@ export default class extends GameObject implements Player {
     );
 
     this.move(level);
-    this.updateOffset();
 
     if (this.controller.action) {
       this.controller.action = false;
