@@ -7,7 +7,7 @@ export function createBug(pos: Vector) {
   return new Bug(pos);
 }
 
-const DIRECTIONS = [-1.5, 1.5];
+const DIRECTIONS = [-1.75, 1.75];
 
 class Bug extends Player {
   vel: Vector = [0, 0];
@@ -21,9 +21,10 @@ class Bug extends Player {
     super("bug", pos, "lightgreen");
 
     this.type = "bug";
+    this.w = this.h = TILE_SIZE / 2;
+
     this.canBePicked = Math.random() > 0.6;
     this.canStealItem = Math.random() > 0.5;
-    this.w = this.h = TILE_SIZE / 2;
 
     let axis = Math.round(Math.random());
     this.vel[axis] = DIRECTIONS[Math.round(Math.random())];
@@ -98,6 +99,8 @@ class Bug extends Player {
 
     return this;
   }
+
+  renderId() {}
 
   renderDetails() {}
 }

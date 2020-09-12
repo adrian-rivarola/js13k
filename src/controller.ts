@@ -1,4 +1,4 @@
-import GAME from "./game";
+import game from "./game";
 
 const KEYBOARD: Record<string, { state: boolean; active: boolean }> = {};
 
@@ -14,7 +14,7 @@ onkeydown = onkeyup = (ev) => {
   }
 
   if (KEYBOARD["p"]?.active) {
-    GAME.isPaused = !GAME.isPaused;
+    game.isPaused = !game.isPaused;
     KEYBOARD["p"].active = false;
   }
 };

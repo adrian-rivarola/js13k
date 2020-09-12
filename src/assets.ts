@@ -2,10 +2,14 @@ import robotB from "../assets/robot.png";
 import robotA from "../assets/hands.png";
 import floor from "../assets/floor.png";
 import modifier from "../assets/modifier.png";
+import provider from "../assets/provider.png";
+import storage from "../assets/storage.png";
 
 const images = {
   floor: new Image(),
+  storage: new Image(),
   modifier: new Image(),
+  provider: new Image(),
   player: new Image(),
   playerArms: new Image(),
 };
@@ -23,9 +27,11 @@ export function loadAssets(): Promise<Record<string, HTMLImageElement>> {
     }
 
     images.floor.src = floor;
+    images.storage.src = storage;
     images.modifier.src = modifier;
-    images.player.src = robotB;
+    images.provider.src = provider;
     images.playerArms.src = robotA;
+    images.player.src = robotB;
   });
 }
 

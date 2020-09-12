@@ -13,5 +13,5 @@ export function createItemProvider(pos: Vector, itemId: string) {
     GAME.objects.push(newItem);
   };
 
-  return new Modifier(itemId, "modifier", pos, createItemCommand);
+  return new Modifier(itemId, "provider", pos, createItemCommand);
 }

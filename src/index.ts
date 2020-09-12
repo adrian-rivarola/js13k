@@ -6,7 +6,7 @@ import { KeyboardController, VirtualController } from "./controller";
 import game from "./game";
 
 const mainDiv = document.getElementById("game"),
-  gameForm = document.forms[0];
+  startButton = document.getElementById("start");
 
 onblur = () => (game.isPaused = true);
 
@@ -25,12 +25,11 @@ onload = () => {
     loop();
   });
 
-  gameForm.onsubmit = (ev) => {
-    ev.preventDefault();
+  startButton.onclick = () => {
     mainDiv.style.display = "none";
 
     game.players = createPlayers();
-    game.loadLevel(0);
+    game.loadLevel(2);
   };
 };
 

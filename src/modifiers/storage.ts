@@ -36,7 +36,7 @@ export function createStorageServer(pos: Vector, objective: Objective) {
     server.id = `${storage.length}/${capacity}`;
   }
 
-  server = new Modifier(`0/${capacity}`, "server", pos, command, "grey");
+  server = new Modifier(`0/${capacity}`, "storage", pos, command, "grey");
 
   server.renderDetails = function (ctx: Ctx) {
     ctx.translate(4, 4);

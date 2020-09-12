@@ -1,4 +1,4 @@
-const COLORS = ["#80ffdb", "#e63946", "#fca311", "blue", "green"];
+const COLORS = ["#80ffdb", "#e63946", "#fca311", "#0077b6", "#8ac926"];
 const ITEMS = [
   "< title />",
   "< article />",
@@ -21,7 +21,10 @@ const level1: LevelConfig = {
   message: "Welcome to level #1",
   items: ITEMS.slice(0, 3),
   colors: COLORS.slice(0, 4),
-  bugs: [[13, 13]],
+  bugs: [
+    [3, 3],
+    [13, 13],
+  ],
   providers: [
     [2, 5],
     [2, 7],

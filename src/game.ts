@@ -1,6 +1,6 @@
 import ASSETS from "./assets";
 import LEVELS from "./levels";
-import { TILE_SIZE } from "./setup";
+import { TILE_SIZE, MAP_SIZE } from "./setup";
 
 import { displayMessage } from "./toast";
 
@@ -27,6 +27,7 @@ class Game implements GameState {
     this.level = level % LEVELS.length;
     this.objects = [...this.players];
     this.levelCompleted = false;
+    this.isPaused = false;
 
     this.players.forEach((player) => player.resetPos());
 
@@ -69,20 +70,18 @@ class Game implements GameState {
     ctx.translate(0, 10);
 
     this.objectives.forEach((objective, i) => {
-      ctx.translate(i > 0 ? TILE_SIZE * 2.5 : TILE_SIZE * 0.5, 0);
+      const xOffset = i > 0 ? 2.5 : 0.5;
+      ctx.translate(TILE_SIZE * xOffset, 0);
 
       ctx.globalAlpha = objective.completed ? 0.5 : 1;
 
       objective.components.forEach(({ itemId, color }, j) => {
         ctx.fillStyle = color;
-        ctx.fillRect(0, 18 * j, TILE_SIZE * 2, 18);
+        ctx.fillRect(0, 19 * j, TILE_SIZE * 2, 18);
 
         ctx.fillStyle = "black";
-        ctx.fillText(itemId, TILE_SIZE, (1 + j) * 16.5);
+        ctx.fillText(itemId, TILE_SIZE, (1 + j) * 17);
       });
-
-      ctx.strokeStyle = objective.completed ? "lightgreen" : "black";
-      ctx.strokeRect(0, 0, TILE_SIZE * 2, objective.components.length * 18);
     });
 
     ctx.restore();
@@ -100,7 +99,7 @@ class Game implements GameState {
   }
 
   render(ctx: Ctx) {
-    drawFloor(ctx);
+    ctx.drawImage(ASSETS.floor, 0, 0, MAP_SIZE, MAP_SIZE);
 
     if (this.level === -1) {
       return;
@@ -110,7 +109,9 @@ class Game implements GameState {
       ctx.fillStyle = "white";
       ctx.textAlign = "center";
       ctx.font = "2rem monospace";
-      ctx.fillText("Game Paused", ctx.canvas.width / 2, ctx.canvas.width / 2);
+
+      ctx.fillText("Game Paused", MAP_SIZE / 2, MAP_SIZE / 2);
+
       return;
     }
 
@@ -122,17 +123,6 @@ class Game implements GameState {
   }
 }
 
-function drawFloor(ctx: Ctx) {
-  let s = ctx.canvas.width;
-
-  ctx.save();
-  ctx.drawImage(ASSETS.floor, 0, 0, s, s);
-
-  // ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-  // ctx.fillRect(0, 0, s, s);
-
-  ctx.restore();
-}
-
 const game = new Game();
+
 export default game;
