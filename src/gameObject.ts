@@ -7,7 +7,6 @@ export default class implements GameObject {
   active = true;
   preventCollision = false;
 
-  asset?: HTMLImageElement;
   w = TILE_SIZE * 1.5;
   h = TILE_SIZE * 0.25;
 
@@ -26,7 +25,6 @@ export default class implements GameObject {
     public gridPos: Vector,
     public color: Color = "white"
   ) {
-    this.asset = ASSETS[type];
     this.resetPos();
   }
 
@@ -79,7 +77,7 @@ export default class implements GameObject {
     return result;
   }
 
-  update(level?: GameObject[]): GameObject {
+  update(level: GameObject[], blocks: Vector[]): GameObject {
     this.type === "item" && this.updateOffset();
     return this;
   }
@@ -121,8 +119,8 @@ export default class implements GameObject {
 
     this.renderDetails(ctx);
 
-    this.asset
-      ? ctx.drawImage(this.asset, 0, 0, this.w, this.h)
+    ASSETS[this.type]
+      ? ctx.drawImage(ASSETS[this.type], 0, 0, this.w, this.h)
       : ctx.fillRect(0, 0, this.w, this.h);
 
     ctx.restore();

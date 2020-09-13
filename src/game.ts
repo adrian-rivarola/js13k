@@ -20,6 +20,7 @@ class Game implements GameState {
 
   players: Player[] = [];
   objects: GameObject[] = [];
+  blocks: Vector[] = [];
 
   objectives: Objective[] = [];
 
@@ -33,16 +34,20 @@ class Game implements GameState {
 
     const config = LEVELS[this.level];
 
+    this.objectives = config.servers.map(() =>
+      createRandomObjective(config.items, config.colors)
+    );
+
+    this.blocks = config.blocks.map(
+      (pos) => pos.map((coord) => coord * TILE_SIZE) as Vector
+    );
+
     const providers = config.providers.map((pos, idx) =>
       createItemProvider(pos, config.items[idx])
     );
 
     const painters = config.painters.map((pos, idx) =>
       createPainter(pos, config.colors[idx])
-    );
-
-    this.objectives = config.servers.map(() =>
-      createRandomObjective(config.items, config.colors)
     );
 
     const servers = this.objectives.map((objective, idx) =>
@@ -58,6 +63,11 @@ class Game implements GameState {
 
   resize(scaleTo: number) {
     this.objects.forEach((object) => object.onResize(scaleTo));
+
+    this.blocks.forEach((pos) => {
+      pos[0] *= scaleTo;
+      pos[1] *= scaleTo;
+    });
   }
 
   renderObjectives(ctx: Ctx) {
@@ -81,7 +91,11 @@ class Game implements GameState {
         ctx.strokeRect(0, 19 * j, TILE_SIZE * 2, 18);
 
         ctx.fillStyle = "black";
-        ctx.fillText(itemId, TILE_SIZE, (1 + j) * 17);
+        ctx.fillText(
+          itemId.substring(2, itemId.length - 2),
+          TILE_SIZE,
+          (1 + j) * 17
+        );
       });
     });
 
@@ -118,8 +132,12 @@ class Game implements GameState {
 
     this.renderObjectives(ctx);
 
+    this.blocks.forEach((pos) => {
+      ctx.drawImage(ASSETS.block, pos[0], pos[1], TILE_SIZE, TILE_SIZE * 1.5);
+    });
+
     this.objects.forEach((object) => {
-      object.active && object.update(this.objects).render(ctx);
+      object.active && object.update(this.objects, this.blocks).render(ctx);
     });
   }
 }

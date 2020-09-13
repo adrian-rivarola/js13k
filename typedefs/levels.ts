@@ -6,4 +6,5 @@ interface LevelConfig {
   servers: Vector[];
   message: string;
   bugs: Vector[];
+  blocks: Vector[];
 }

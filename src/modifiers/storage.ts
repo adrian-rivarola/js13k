@@ -9,7 +9,7 @@ export function createStorageServer(pos: Vector, objective: Objective) {
   function command(player: Player) {
     if (objective.completed) return;
 
-    server.color = "grey";
+    server.color = "white";
 
     if (!player.item) {
       // retrive an object from storage, if any
@@ -23,8 +23,10 @@ export function createStorageServer(pos: Vector, objective: Objective) {
 
       if (playerItem.type === "bug") {
         storage.forEach((object) => {
-          object.setColor("darkgreen");
+          object.active = true;
         });
+
+        storage.splice(0, storage.length);
       }
 
       if (storage.length === objective.components.length) {
@@ -43,7 +45,7 @@ export function createStorageServer(pos: Vector, objective: Objective) {
     server.id = `${storage.length}/${capacity}`;
   }
 
-  server = new Modifier(`0/${capacity}`, "storage", pos, command, "grey");
+  server = new Modifier(`0/${capacity}`, "storage", pos, command, "white");
 
   server.renderDetails = () => {};
   //   ctx.save();

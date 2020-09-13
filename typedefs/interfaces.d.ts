@@ -2,12 +2,14 @@ type Color = string | CanvasGradient | CanvasPattern;
 type Command = (player: Player) => void;
 type Ctx = CanvasRenderingContext2D;
 type Vector = [number, number];
+type BlockPosition = [string | number, number | string];
 
 interface GameState {
   isPaused: boolean;
   level: number;
   objects: GameObject[];
   objectives: Objective[];
+  blocks: Vector[];
   players: Player[];
 
   onObjectiveCompleted(): void;
@@ -55,7 +57,7 @@ interface GameObject {
   setColor(newColor: Color): void;
   resetPos(): void;
 
-  update(level?: GameObject[]): GameObject;
+  update(level: GameObject[], blocks: Vector[]): GameObject;
   render(ctx: Ctx): void;
   renderId(ctx: Ctx): void;
   renderDetails(ctx: Ctx): void;
@@ -67,7 +69,7 @@ interface Player extends GameObject {
   vel: Vector;
   maxSpeed: number;
 
-  move(level: GameObject[]): void;
+  move(level: GameObject[], blocks: Vector[]): void;
   pickItem(item: GameObject): void;
   dropItem(isActive?: boolean): GameObject;
 }

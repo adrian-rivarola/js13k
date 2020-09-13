@@ -13,5 +13,7 @@ export function createItemProvider(pos: Vector, itemId: string) {
     GAME.objects.push(newItem);
   };
 
-  return new Modifier(itemId, "provider", pos, createItemCommand);
+  const provider = new Modifier(itemId, "provider", pos, createItemCommand);
+
+  return provider;
 }

@@ -123,10 +123,7 @@ class Bug extends Player {
 
   renderDetails(ctx: Ctx) {
     ctx.save();
-    ctx.globalAlpha = 0.4;
-    ctx.beginPath();
-    ctx.arc(this.w * 0.5, this.w * 0.5, this.scope, 0, Math.PI * 2);
-    ctx.stroke();
+
     ctx.restore();
   }
 }

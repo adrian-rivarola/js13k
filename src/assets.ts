@@ -4,9 +4,13 @@ import robotBody from "../assets/robot.png";
 import painter from "../assets/painter.png";
 import storage from "../assets/storage.png";
 import provider from "../assets/provider.png";
+import block from "../assets/block.png";
+import bug from "../assets/bug.png";
 
 const images = {
   floor: new Image(),
+  bug: new Image(),
+  block: new Image(),
   storage: new Image(),
   painter: new Image(),
   provider: new Image(),
@@ -26,7 +30,9 @@ export function loadAssets(): Promise<Record<string, HTMLImageElement>> {
       images[key].onerror = reject;
     }
 
+    images.bug.src = bug;
     images.floor.src = floor;
+    images.block.src = block;
     images.storage.src = storage;
     images.painter.src = painter;
     images.provider.src = provider;

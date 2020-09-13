@@ -65,13 +65,19 @@ export default class extends GameObjectClass implements Player {
     this.vel[1] = clamp(-s, s, this.vel[1]);
   }
 
-  move(level: GameObject[]) {
+  move(level: GameObject[], blocks: Vector[]) {
     this.accelerate();
     this.updateOffset();
 
     const nextPos = addVectors(this.pos, this.vel);
 
     if (!this.owner) {
+      let wallCollision = blocks.some(
+        (pos) => getDistance(pos, nextPos) < TILE_SIZE * 0.9
+      );
+
+      if (wallCollision) return;
+
       let collision = level.some(
         (object) =>
           object.preventCollision &&
@@ -117,13 +123,14 @@ export default class extends GameObjectClass implements Player {
 
     return item;
   }
-  update(level?: GameObject[]) {
+
+  update(level: GameObject[], blocks: Vector[]) {
     level = level.filter(
       (object) =>
         object.id !== this.id && !object.owner && this.id !== object.item?.id
     );
 
-    this.move(level);
+    this.move(level, blocks);
 
     if (this.controller.action) {
       this.controller.action = false;

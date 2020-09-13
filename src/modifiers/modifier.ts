@@ -12,8 +12,17 @@ export default class extends GameObjectClass {
     color?: Color
   ) {
     super(id, type, position, color);
-    this.w = this.h = TILE_SIZE;
+    this.w = TILE_SIZE;
+
+    if (type !== "painter") this.h = TILE_SIZE * 1.5;
+    else this.h = TILE_SIZE;
 
     this.onAction = (player: Player) => actionCommand(player);
   }
 }
+
+/*
+1 => 8a4926
+2 => 461c14
+3 => 1e090d
+*/

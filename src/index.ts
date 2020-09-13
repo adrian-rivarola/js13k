@@ -29,7 +29,7 @@ onload = () => {
     mainDiv.style.display = "none";
 
     game.players = createPlayers();
-    game.loadLevel(2);
+    game.loadLevel(0);
   };
 };
 
@@ -39,16 +39,16 @@ function createPlayers() {
       ? [
           new Player(
             "Player1",
-            [6, 7],
+            [7.5, 7],
             "red",
             new KeyboardController("wsadxc")
           ),
-          new Player(
-            "Player2",
-            [9, 7],
-            "orange",
-            new KeyboardController("824650")
-          ),
+          // new Player(
+          //   "Player2",
+          //   [9, 7],
+          //   "orange",
+          //   new KeyboardController("824650")
+          // ),
         ]
       : [new Player("Player1", [7.5, 7.5], "red", new VirtualController())];
 
