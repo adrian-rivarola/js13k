@@ -4,13 +4,7 @@ export function createPainter(pos: Vector, color: string) {
   const paintItemCommand: Command = (player: Player) =>
     player.item?.setColor(color);
 
-  const painter = new Modifier(
-    "Paint item",
-    "painter",
-    pos,
-    paintItemCommand,
-    color
-  );
+  const painter = new Modifier("", "painter", pos, paintItemCommand, color);
 
   painter.renderDetails = (ctx: Ctx) => {
     ctx.fillStyle = color;

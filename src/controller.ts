@@ -47,7 +47,7 @@ export class KeyboardController implements Controller {
 
 export class VirtualController extends KeyboardController {
   constructor() {
-    super(["VU", "VD", "VL", "VR", "VA", "VX"]);
+    super(["VUP", "VDOWN", "VLEFT", "VRIGHT", "VACTION", "VDROP"]);
     this.init();
   }
 

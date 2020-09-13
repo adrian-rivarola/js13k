@@ -8,19 +8,18 @@ interface GameState {
   isPaused: boolean;
   level: number;
   objects: GameObject[];
-  objectives: Objective[];
+  tasks: Task[];
   blocks: Vector[];
   players: Player[];
 
-  onObjectiveCompleted(): void;
+  onTaskCompleted(resetServer: (newTask: Task) => void): void;
   resize(scaleTo: number): void;
   render(ctx: Ctx): void;
 }
 
-interface Objective {
+interface Task {
   components: PageComponent[];
   completed: boolean;
-  timeToComplete: number;
 }
 
 interface PageComponent {

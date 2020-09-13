@@ -9,7 +9,7 @@ export default class extends GameObjectClass implements Player {
   vel: Vector = [0, 0];
   item?: GameObject;
   maxSpeed = TILE_SIZE / 12;
-  acc = 0.2;
+  acc = 0.15;
 
   scope = TILE_SIZE * 1.5;
 
@@ -32,8 +32,8 @@ export default class extends GameObjectClass implements Player {
 
   get rotation() {
     const [dx] = this.vel;
-    if (dx > 0) return 0.1;
-    if (dx < 0) return -0.1;
+    if (dx > 0) return 0.15;
+    if (dx < 0) return -0.15;
     return 0;
   }
 
@@ -73,7 +73,7 @@ export default class extends GameObjectClass implements Player {
 
     if (!this.owner) {
       let wallCollision = blocks.some(
-        (pos) => getDistance(pos, nextPos) < TILE_SIZE * 0.9
+        (pos) => getDistance(pos, nextPos) < TILE_SIZE * 0.85
       );
 
       if (wallCollision) return;
@@ -81,7 +81,7 @@ export default class extends GameObjectClass implements Player {
       let collision = level.some(
         (object) =>
           object.preventCollision &&
-          getDistance(object.pos, nextPos) < TILE_SIZE * 0.9
+          getDistance(object.pos, nextPos) < TILE_SIZE * 0.85
       );
 
       if (collision) return;

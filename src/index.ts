@@ -6,7 +6,8 @@ import { KeyboardController, VirtualController } from "./controller";
 import game from "./game";
 
 const mainDiv = document.getElementById("game"),
-  startButton = document.getElementById("start");
+  start1Button = document.getElementById("start1"),
+  start2Button = document.getElementById("start2");
 
 onblur = () => (game.isPaused = true);
 
@@ -25,32 +26,43 @@ onload = () => {
     loop();
   });
 
-  startButton.onclick = () => {
-    mainDiv.style.display = "none";
+  if (window.orientation !== undefined) {
+    start1Button.innerText = "Start";
 
-    game.players = createPlayers();
-    game.loadLevel(0);
-  };
+    start2Button.style.display = "none";
+  }
+
+  start1Button.onclick = () => startGame(1);
+  start2Button.onclick = () => startGame(2);
 };
 
-function createPlayers() {
-  let players =
-    window.orientation === undefined
-      ? [
-          new Player(
-            "Player1",
-            [7.5, 7],
-            "red",
-            new KeyboardController("wsadxc")
-          ),
-          // new Player(
-          //   "Player2",
-          //   [9, 7],
-          //   "orange",
-          //   new KeyboardController("824650")
-          // ),
-        ]
-      : [new Player("Player1", [7.5, 7.5], "red", new VirtualController())];
+function startGame(n: number) {
+  mainDiv.style.display = "none";
+
+  game.players = createPlayers(n);
+  game.loadLevel(0);
+}
+
+function createPlayers(n: number) {
+  if (window.orientation !== undefined) {
+    return [
+      new Player("Player1", [7.5, 7.5], "orange", new VirtualController()),
+    ];
+  }
+
+  let players = [
+    new Player("Player1", [7.5, 7.5], "pink", new KeyboardController("wsadxc")),
+  ];
+  if (n === 2) {
+    players.push(
+      new Player(
+        "Player2",
+        [7.5, 6.5],
+        "orange",
+        new KeyboardController("824650")
+      )
+    );
+  }
 
   return players;
 }

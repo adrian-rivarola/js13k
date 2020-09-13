@@ -16,25 +16,28 @@ import { createRandomObjective } from "./utils";
 class Game implements GameState {
   isPaused = false;
   levelCompleted = false;
+  endless = false;
   level = -1;
+  score = 0;
 
   players: Player[] = [];
   objects: GameObject[] = [];
   blocks: Vector[] = [];
 
-  objectives: Objective[] = [];
+  tasks: Task[] = [];
 
   loadLevel(level: number) {
     this.level = level % LEVELS.length;
     this.objects = [...this.players];
     this.levelCompleted = false;
     this.isPaused = false;
-
     this.players.forEach((player) => player.resetPos());
 
     const config = LEVELS[this.level];
 
-    this.objectives = config.servers.map(() =>
+    this.endless = !!config.endless;
+
+    this.tasks = config.servers.map(() =>
       createRandomObjective(config.items, config.colors)
     );
 
@@ -50,15 +53,15 @@ class Game implements GameState {
       createPainter(pos, config.colors[idx])
     );
 
-    const servers = this.objectives.map((objective, idx) =>
-      createStorageServer(config.servers[idx], objective)
+    const servers = this.tasks.map((objective, idx) =>
+      createStorageServer(idx + 1, config.servers[idx], objective)
     );
 
     const bugs = config.bugs.map(createBug);
 
     this.objects.unshift(...providers, ...painters, ...servers, ...bugs);
 
-    displayMessage(config.message, 4000);
+    displayMessage(config.message, 10000);
   }
 
   resize(scaleTo: number) {
@@ -70,20 +73,46 @@ class Game implements GameState {
     });
   }
 
-  renderObjectives(ctx: Ctx) {
+  onTaskCompleted(resetServer: (newTask: Task) => void) {
+    this.score += 3;
+
+    if (this.endless) {
+      const levelConfig = LEVELS[this.level];
+      const newTask = createRandomObjective(
+        levelConfig.items,
+        levelConfig.colors
+      );
+      resetServer(newTask);
+
+      const idx = this.tasks.findIndex((task) => task.completed);
+      this.tasks[idx] = newTask;
+    }
+
+    this.levelCompleted = this.tasks.every((objective) => objective.completed);
+
+    if (this.levelCompleted) {
+      this.score += 2;
+      setTimeout(() => this.loadLevel(this.level + 1), 3000);
+    }
+  }
+
+  renderTasks(ctx: Ctx) {
     ctx.save();
 
     ctx.textAlign = "center";
     ctx.font = "14px bold";
 
     ctx.lineWidth = 1;
-    ctx.translate(0, 10);
+    ctx.translate(0, 20);
 
-    this.objectives.forEach((objective, i) => {
+    this.tasks.forEach((objective, i) => {
       const xOffset = i > 0 ? 2.5 : 0.5;
-      ctx.translate(TILE_SIZE * xOffset, 0);
 
+      ctx.translate(TILE_SIZE * xOffset, 0);
       ctx.globalAlpha = objective.completed ? 0.5 : 1;
+
+      ctx.fillStyle = "white";
+      ctx.fillText(`Task# ${i + 1}`, TILE_SIZE, -1);
 
       objective.components.forEach(({ itemId, color }, j) => {
         ctx.fillStyle = color;
@@ -102,18 +131,9 @@ class Game implements GameState {
     ctx.restore();
   }
 
-  onObjectiveCompleted() {
-    this.levelCompleted = this.objectives.every(
-      (objective) => objective.completed
-    );
-
-    if (this.levelCompleted) {
-      displayMessage("Level Completed!", 5000);
-      setTimeout(() => this.loadLevel(this.level + 1), 6000);
-    }
-  }
-
   render(ctx: Ctx) {
+    ctx.save();
+
     ctx.drawImage(ASSETS.floor, 0, 0, MAP_SIZE, MAP_SIZE);
 
     if (this.level === -1) {
@@ -130,15 +150,22 @@ class Game implements GameState {
       return;
     }
 
-    this.renderObjectives(ctx);
-
     this.blocks.forEach((pos) => {
       ctx.drawImage(ASSETS.block, pos[0], pos[1], TILE_SIZE, TILE_SIZE * 1.5);
     });
 
+    this.renderTasks(ctx);
+
     this.objects.forEach((object) => {
       object.active && object.update(this.objects, this.blocks).render(ctx);
     });
+
+    ctx.font = "1.5rem bold monospace";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "white";
+    ctx.fillText(`Score: ${this.score}`, TILE_SIZE * 14.5, TILE_SIZE / 2);
+
+    ctx.restore();
   }
 }
 

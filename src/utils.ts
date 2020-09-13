@@ -1,3 +1,5 @@
+import { TILE_SIZE } from "./setup";
+
 export function clamp(min: number, max: number, num: number) {
   return Math.max(min, Math.min(num, max));
 }
@@ -18,11 +20,7 @@ export const HUE_MAP: Record<string, number> = {
   red: 1,
 };
 
-export function createRandomObjective(
-  items: string[],
-  colors: string[],
-  timeToComplete = 30000
-): Objective {
+export function createRandomObjective(items: string[], colors: string[]): Task {
   let randItems: number[] = [],
     randColors: number[] = [],
     idxItem: number,
@@ -48,7 +46,6 @@ export function createRandomObjective(
 
   return {
     components,
-    timeToComplete,
     completed: false,
   };
 }

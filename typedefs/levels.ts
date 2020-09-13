@@ -7,4 +7,5 @@ interface LevelConfig {
   message: string;
   bugs: Vector[];
   blocks: Vector[];
+  endless?: boolean;
 }

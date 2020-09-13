@@ -1,4 +1,11 @@
-const COLORS = ["#80ffdb", "#e63946", "#fca311", "#0077b6", "#8ac926"];
+const COLORS = [
+  "#80ffdb",
+  "#e63946",
+  "#fca311",
+  "#0077b6",
+  "#8ac926",
+  "#8338ec",
+];
 const ITEMS = [
   "< title />",
   "< article />",
@@ -7,33 +14,55 @@ const ITEMS = [
   "< link />",
 ];
 
-const blocks1: BlockPosition[] = [
-  [3, 4],
-  [4, 5],
-  ["8-13", 5],
-  [9, "4-7"],
-  ["10-12", 10],
-  ["7-9", 11],
-  [6, 12],
-  [13, 14],
+const blocks0: BlockPosition[] = [
+  ["5-10", 10],
+  [5, "10-15"],
+  [10, "10-15"],
+  [0, 11],
+  [1, "8-10"],
+  [2, "5-7"],
+  ["3-5", 4],
+  [15, 11],
+  [14, "8-10"],
+  [13, "5-7"],
+  ["10-12", 4],
+  ["6-9", 1],
 ];
-
 const level0: LevelConfig = {
-  message: "Welcome to level #0",
+  message: `Welcome to Guitecs Industries, your job here will be to create
+  web pages and store them in our servers, you can see your pending tasks
+  on the upper left corner`,
   items: ["< HelloWorld />"],
   colors: ["teal"],
   bugs: [],
-  blocks: [...createArrayOfBlocks(blocks1)],
-  providers: [[3, 7]],
-  painters: [[12, 7]],
-  servers: [[3, 13]],
+  blocks: [...createArrayOfBlocks(blocks0)],
+  providers: [[3, 12]],
+  painters: [[12, 12]],
+  servers: [[7.5, 3]],
 };
 
+const blocks1: BlockPosition[] = [
+  [1, 14],
+  [2, 13],
+  [3, 12],
+  ["4-5", 11],
+  [14, 14],
+  [13, 13],
+  [12, 12],
+  ["10-11", 11],
+  [7.5, 10],
+  ["1-14", 2],
+  [5, "3-4"],
+  [10, "3-4"],
+  [7.5, 5],
+];
 const level1: LevelConfig = {
-  message: "Welcome to level #1",
+  message: `You passed the interview, congratulations! You will now be working
+  on our production server. Just avoid making contact with the bugs,
+  and everything should be just fine :D`,
   items: ITEMS.slice(0, 3),
-  colors: COLORS.slice(0, 4),
-  blocks: [],
+  colors: COLORS.slice(0, 3),
+  blocks: [...createArrayOfBlocks(blocks1)],
   bugs: [
     [3, 3],
     [13, 13],
@@ -44,45 +73,53 @@ const level1: LevelConfig = {
     [2, 9],
   ],
   painters: [
-    [13, 4],
-    [13, 6],
-    [13, 8],
-    [13, 10],
+    [13, 5],
+    [13, 7],
+    [13, 9],
   ],
   servers: [
-    [6, 13],
-    [9, 13],
+    [5, 13],
+    [7.5, 14],
+    [10, 13],
   ],
 };
 
+const blocks2: BlockPosition[] = [
+  ["5-10", 9],
+  ["6-9", 4],
+  ["7-8", 13],
+  ["7-8", 14],
+];
 const level2: LevelConfig = {
-  message: "Welcome to level #2",
-  items: ITEMS,
+  endless: true,
+  message: `Incredible job! You are now a permanent part of the organization,
+  remember to complete your tasks as fast as posible, otherwise
+  the users may recieve an ugly 404 ERROR`,
+  items: ITEMS.slice(2, 6),
   colors: COLORS,
-  blocks: [],
+  blocks: createArrayOfBlocks(blocks2),
   bugs: [
     [3, 3],
     [12, 12],
     [3, 12],
   ],
   providers: [
-    [14, 3],
-    [14, 5],
-    [14, 7],
-    [14, 9],
-    [14, 11],
+    [1, 11],
+    [3, 12],
+    [5, 13],
   ],
   painters: [
-    [1, 3],
-    [1, 5],
-    [1, 7],
-    [1, 9],
-    [1, 11],
+    [14, 4],
+    [14, 6],
+    [14, 8],
+    [1, 4],
+    [1, 6],
+    [1, 8],
   ],
   servers: [
-    [5, 14],
-    [7.5, 14],
-    [10, 14],
+    [10, 13],
+    [12, 12],
+    [14, 11],
   ],
 };
 
