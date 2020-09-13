@@ -31,9 +31,20 @@ class Bug extends Player {
     this.vel[1 - axis] = pos[axis] * 0.15;
   }
 
+  setColor(newColor: Color) {
+    this.owner?.setColor(newColor);
+  }
+
   onAction(player: Player) {
     if (player.item) {
+      if (player.item.type === "bug") {
+        player.dropItem(false);
+        this.evolve();
+
+        return;
+      }
       if (!this.item) this.pickItem(player.dropItem());
+
       return;
     }
 
@@ -42,8 +53,14 @@ class Bug extends Player {
     if (this.canBePicked) return player.pickItem(this);
   }
 
-  setColor(newColor: Color) {
-    this.owner?.setColor(newColor);
+  evolve() {
+    this.canBePicked = false;
+
+    this.scope *= 1.25;
+    this.w *= 2;
+    this.h *= 2;
+    this.vel[0] *= 1.125;
+    this.vel[1] *= 1.125;
   }
 
   accelerate() {}
@@ -53,8 +70,12 @@ class Bug extends Player {
 
     this.pos = addVectors(this.pos, this.vel);
 
-    if (this.pos[0] < 0 || this.pos[0] > MAP_SIZE - this.w) this.vel[0] *= -1;
-    if (this.pos[1] < 0 || this.pos[1] > MAP_SIZE - this.w) this.vel[1] *= -1;
+    const limit = TILE_SIZE * 1.5;
+
+    if (this.pos[0] < limit || this.pos[0] > MAP_SIZE - limit)
+      this.vel[0] *= -1;
+    if (this.pos[1] < limit || this.pos[1] > MAP_SIZE - limit)
+      this.vel[1] *= -1;
   }
 
   update(level: GameObject[]) {
@@ -75,9 +96,7 @@ class Bug extends Player {
     level = level.filter(
       (object) =>
         object.type === "item" ||
-        (object.type === "player" &&
-          object.item &&
-          object.item.type !== "player")
+        (object.type === "player" && object.item?.type === "item")
     );
 
     const [target, dist] = this.getClosestObject(level);
@@ -95,12 +114,19 @@ class Bug extends Player {
 
     this.canStealItem
       ? this.pickItem((target as Player).dropItem())
-      : target.item.setColor("lime");
+      : target.item.setColor("darkgreen");
 
     return this;
   }
 
   renderId() {}
 
-  renderDetails() {}
+  renderDetails(ctx: Ctx) {
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath();
+    ctx.arc(this.w * 0.5, this.w * 0.5, this.scope, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
 }

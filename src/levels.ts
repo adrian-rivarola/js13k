@@ -47,9 +47,9 @@ const level2: LevelConfig = {
   items: ITEMS,
   colors: COLORS,
   bugs: [
-    [1, 1],
-    [14, 14],
-    [1, 14],
+    [3, 3],
+    [12, 12],
+    [3, 12],
   ],
   providers: [
     [14, 3],

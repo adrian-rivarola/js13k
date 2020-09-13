@@ -66,7 +66,7 @@ class Game implements GameState {
     ctx.textAlign = "center";
     ctx.font = "14px bold";
 
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 1;
     ctx.translate(0, 10);
 
     this.objectives.forEach((objective, i) => {
@@ -78,6 +78,7 @@ class Game implements GameState {
       objective.components.forEach(({ itemId, color }, j) => {
         ctx.fillStyle = color;
         ctx.fillRect(0, 19 * j, TILE_SIZE * 2, 18);
+        ctx.strokeRect(0, 19 * j, TILE_SIZE * 2, 18);
 
         ctx.fillStyle = "black";
         ctx.fillText(itemId, TILE_SIZE, (1 + j) * 17);

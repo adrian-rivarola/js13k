@@ -138,6 +138,8 @@ export default class extends GameObjectClass implements Player {
   }
 
   renderDetails(ctx: Ctx) {
+    ctx.save();
+
     if (this.item) {
       // raise hands
       ctx.translate(0, this.h * 0.75);
@@ -146,5 +148,7 @@ export default class extends GameObjectClass implements Player {
       ctx.translate(0, this.h * 0.25);
     }
     ctx.drawImage(ASSETS.playerArms, 0, 0, this.w, this.h);
+
+    ctx.restore();
   }
 }

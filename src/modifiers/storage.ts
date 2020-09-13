@@ -18,7 +18,14 @@ export function createStorageServer(pos: Vector, objective: Objective) {
       }
     } else if (!player.item.item && storage.length < capacity) {
       // store player's item, and stop rendering it
-      storage.push(player.dropItem(false));
+      const playerItem = player.dropItem(false);
+      storage.push(playerItem);
+
+      if (playerItem.type === "bug") {
+        storage.forEach((object) => {
+          object.setColor("darkgreen");
+        });
+      }
 
       if (storage.length === objective.components.length) {
         objective.completed = storage.every(
@@ -38,14 +45,18 @@ export function createStorageServer(pos: Vector, objective: Objective) {
 
   server = new Modifier(`0/${capacity}`, "storage", pos, command, "grey");
 
-  server.renderDetails = function (ctx: Ctx) {
-    ctx.translate(4, 4);
-
-    storage.forEach((object, idx) => {
-      ctx.fillStyle = object.color;
-      ctx.fillRect(0, idx * 8, server.w - 8, 6);
-    });
-  };
+  server.renderDetails = () => {};
+  //   ctx.save();
+  //
+  //   ctx.translate(8, 4);
+  //
+  //   storage.forEach((object, idx) => {
+  //     ctx.fillStyle = object.color;
+  //     ctx.fillRect(0, idx * 7, server.w - 16, 3);
+  //   });
+  //
+  //   ctx.restore();
+  // };
 
   return server;
 }

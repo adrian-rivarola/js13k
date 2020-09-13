@@ -16,9 +16,4 @@ export default class extends GameObjectClass {
 
     this.onAction = (player: Player) => actionCommand(player);
   }
-
-  renderDetails(ctx: Ctx) {
-    // ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-    // ctx.fillRect(0, 0, this.w, this.h);
-  }
 }
